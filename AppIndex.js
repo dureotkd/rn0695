@@ -24,7 +24,8 @@ function AppIndex() {
         }}
       >
       </Pressable> */}
-      <NonLoginedNavi />
+      {/* <NonLoginedNavi /> */}
+      <LoginedNavi />
     </NavigationContainer>
   );
 }
@@ -95,19 +96,23 @@ const NonLoginedNavi = () => {
 };
 
 const LoginedNavi = () => {
+  const PAGES = [
+    {
+      name: 'HOME',
+      component: A,
+      options: {
+        tabBarIcon: () => {},
+      },
+    },
+  ];
+
   return (
-    <Stack.Navigator>
-      <Stack.Group>
-        <Stack.Screen
-          name="Auth22"
-          component={(() => (
-            <View>
-              <Text>LoginedNavi</Text>
-            </View>
-          ))()}
-        />
-      </Stack.Group>
-    </Stack.Navigator>
+    <Tab.Navigator>
+      {PAGES.length > 0 &&
+        PAGES.map(({ name, component, options }) => {
+          return <Tab.Screen name={name} component={component} options={options} />;
+        })}
+    </Tab.Navigator>
   );
 };
 
