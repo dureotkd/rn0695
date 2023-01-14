@@ -37,14 +37,8 @@ const RADIUS = {
 };
 
 const FONT_SIZE = {
-  cell: hp('1.25%'),
   sm: wp('3.2%'),
-  bsm: wp('1.75%'),
-  gd: wp('1.8%'),
-  gd2: wp('2.0%'),
-  gd3: hp('2.25%'),
-  md: wp('3.2%'),
-  lg: wp('3.73%'),
+  md: wp('3.9%'),
   xl: wp('4.26%'),
   xxl: wp('4.8%'),
   xxxl: wp('5.33%'),
@@ -56,9 +50,9 @@ const MARGIN = {
   sm: wp('1.06%'),
   md: wp('1.6%'),
   lg: wp('2.13%'),
-  xl: wp('2.66%'),
-  xxl: wp('3.2%'),
-  xxxl: wp('3.7%'),
+  xl: wp('3.66%'),
+  xxl: wp('4.2%'),
+  xxxl: wp('5.7%'),
 };
 
 //
@@ -66,7 +60,7 @@ const SPACING = {
   sm: wp('2%'),
   bsm: wp('3%'),
   gd: wp('4%'),
-  layout: wp('2.66%') * 2,
+  layout: wp('2.66%'),
   bLayout: wp('8.6%'),
 };
 

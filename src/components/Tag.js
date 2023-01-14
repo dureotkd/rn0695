@@ -1,10 +1,10 @@
 import React from 'react';
 
 import { Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { COLORS, FONT_SIZE, hp, MARGIN } from '@src/assets/style/theme';
+import { COLORS, FONT_SIZE, hp, MARGIN, wp } from '@src/assets/style/theme';
 
 function TagButton(props) {
-  const { data, maxSelect, gIndex, multiColor, colorStyle, onPress } = props;
+  const { data, maxSelect, colorStyle, onPress } = props;
 
   let transBackgroundStyles = '';
   let transFontStyles = '';
@@ -27,10 +27,9 @@ function TagButton(props) {
       activeOpacity={0.4}
       disabled={data.disabled}
       onPress={onPress.bind(this, {
-        id: data.id,
+        value: data.value,
         name: data.name,
         maxSelect,
-        gIndex,
       })}
       style={[styles.button, transBackgroundStyles]}
     >
@@ -39,7 +38,7 @@ function TagButton(props) {
           transFontStyles,
           {
             fontWeight: '400',
-            fontSize: hp('1.5%'),
+            fontSize: FONT_SIZE.md,
           },
         ]}
       >
@@ -64,8 +63,11 @@ const styles = StyleSheet.create({
     paddingVertical: MARGIN.xl,
     paddingHorizontal: MARGIN.xl,
     marginTop: MARGIN.md,
-    marginRight: MARGIN.md,
+    marginRight: MARGIN.xl,
     borderRadius: 20,
+    width: wp('20%'),
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

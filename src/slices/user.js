@@ -3,12 +3,11 @@ import { createSlice } from '@reduxjs/toolkit';
 const user = createSlice({
   name: 'user',
   initialState: {
-    id: '',
-    email: '',
+    seq: '',
     name: '',
     age: '',
+    phoneNumber: '',
     gender: '',
-    oauthId: '',
     oauthType: '',
     profiles: ['https://i.ibb.co/M1CG12Q/1-3.png'],
   },
@@ -22,8 +21,11 @@ const user = createSlice({
 
       return state;
     },
+    login(state, action) {
+      state.seq = 1;
+      return state;
+    },
     delete() {},
-    login() {},
     logout() {},
   },
   extraReducers: (_builder) => {},
