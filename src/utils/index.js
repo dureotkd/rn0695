@@ -22,4 +22,4 @@ const removeCommas = (x) => {
   return x.replaceAll(',', '');
 };
 
-export default { empty, wait, numberWithCommas, removeCommas };
+export { empty, wait, numberWithCommas, removeCommas };

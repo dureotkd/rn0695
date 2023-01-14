@@ -1,92 +1,95 @@
-import { userSlice } from './src/slices';
 import React from 'react';
-import { Pressable, SafeAreaView, Text, View } from 'react-native';
+
 import { useDispatch, useSelector } from 'react-redux';
+
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer } from '@react-navigation/native';
+import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
+
+import { Auth } from '@src/views';
+import { BottomSheet } from '@src/components';
+import { Text, View } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { bottomSheetSlice } from '@src/slices';
+
+import { wait } from '@src/utils';
+
+const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
+const navigationTheme = {
+  ...DefaultTheme,
+  colors: {
+    color: '#000',
+    background: '#f0e7db',
+  },
+};
+
 function AppIndex() {
   const dispatch = useDispatch();
 
-  useSelector((state) => {
-    console.log(state.user);
+  const { user } = useSelector((state) => {
+    return state;
   });
 
   return (
-    <NavigationContainer>
-      {/* <Pressable
-        onPress={() => {
-          dispatch(
-            userSlice.actions.set({
-              name: 'zz',
-            }),
-          );
-        }}
-      >
-      </Pressable> */}
-      {/* <NonLoginedNavi /> */}
-      <LoginedNavi />
+    <NavigationContainer theme={navigationTheme}>
+      <NonLoginedNavi />
     </NavigationContainer>
   );
 }
 
-const Stack = createStackNavigator();
-const Tab = createBottomTabNavigator();
-
-const A = () => {
-  return (
-    <OnBoardingLayout>
-      <Text style={{ color: '#000' }}>aaafasffsssaf</Text>
-    </OnBoardingLayout>
-  );
-};
-
+/**
+ * 비로그인 네비게이션
+ */
 const NonLoginedNavi = () => {
   const { PAGES, GROUP_PAGES } = {
     PAGES: [
-      // {
-      //   name: 'Auth4',
-      //   component: A,
-      //   options: {
-      //     headerTitle: '',
-      //   },
-      // },
-    ],
-    GROUP_PAGES: [
       {
-        screenOptions: {
-          headerTitle: '',
+        name: 'Auth',
+        component: Auth,
+        options: {
           headerShown: false,
         },
-        pages: [
-          {
-            name: 'Auth',
-            component: A,
-            options: {},
-          },
-          {
-            name: 'Auth1',
-            component: A,
-            options: {},
-          },
-        ],
       },
     ],
+    GROUP_PAGES: [
+      // {
+      //   screenOptions: {
+      //     headerTitle: '',
+      //     headerShown: false,
+      //   },
+      //   pages: [
+      //     {
+      //       name: 'Auth',
+      //       component: A,
+      //       options: {},
+      //     },
+      //   ],
+      // },
+    ],
   };
+
+  const dispatch = useDispatch();
+  const { bottomSheet } = useSelector((state) => {
+    return state;
+  });
+
+  const [modaldVisible, setModaldVisible] = React.useState(true);
+  const [bottomSheetDown, setBottomSheetDown] = React.useState(false);
 
   return (
     <Stack.Navigator>
       {PAGES.length > 0 &&
         PAGES.map(({ name, component, options }) => {
-          return <Stack.Screen name={name} component={component} options={options} />;
+          return <Stack.Screen key={name} name={name} component={component} options={options} />;
         })}
 
       {GROUP_PAGES.length > 0 &&
-        GROUP_PAGES.map(({ screenOptions, pages }) => {
+        GROUP_PAGES.map(({ screenOptions, pages }, index) => {
           return (
-            <Stack.Group screenOptions={screenOptions}>
+            <Stack.Group key={index} screenOptions={screenOptions}>
               {pages.map(({ name, component, options }) => {
-                return <Stack.Screen name={name} component={component} options={options} />;
+                return <Stack.Screen key={name} name={name} component={component} options={options} />;
               })}
             </Stack.Group>
           );
@@ -95,29 +98,28 @@ const NonLoginedNavi = () => {
   );
 };
 
-const LoginedNavi = () => {
-  const PAGES = [
-    {
-      name: 'HOME',
-      component: A,
-      options: {
-        tabBarIcon: () => {},
-      },
-    },
-  ];
+/**
+ * 로그인 네비게이션
+ */
+// const LoginedNavi = () => {
+//   const PAGES = [
+//     {
+//       name: 'HOME',
+//       component: A,
+//       options: {
+//         tabBarIcon: () => {},
+//       },
+//     },
+//   ];
 
-  return (
-    <Tab.Navigator>
-      {PAGES.length > 0 &&
-        PAGES.map(({ name, component, options }) => {
-          return <Tab.Screen name={name} component={component} options={options} />;
-        })}
-    </Tab.Navigator>
-  );
-};
-
-const OnBoardingLayout = ({ children }) => {
-  return <SafeAreaView>{children}</SafeAreaView>;
-};
+//   return (
+//     <Tab.Navigator>
+//       {PAGES.length > 0 &&
+//         PAGES.map(({ name, component, options }) => {
+//           return <Tab.Screen key={name} name={name} component={component} options={options} />;
+//         })}
+//     </Tab.Navigator>
+//   );
+// };
 
 export default AppIndex;

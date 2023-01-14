@@ -1,16 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const user = createSlice({
-  name: 'user',
+const modal = createSlice({
+  name: 'modal',
   initialState: {
-    id: '',
-    email: '',
-    name: '',
-    age: '',
-    gender: '',
-    oauthId: '',
-    oauthType: '',
-    profiles: ['https://i.ibb.co/M1CG12Q/1-3.png'],
+    show: false,
   },
   reducers: {
     get(state, action) {
@@ -22,11 +15,8 @@ const user = createSlice({
 
       return state;
     },
-    delete() {},
-    login() {},
-    logout() {},
   },
   extraReducers: (_builder) => {},
 });
 
-export default user;
+export default modal;
