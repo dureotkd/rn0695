@@ -33,17 +33,7 @@ function TagButton(props) {
       })}
       style={[styles.button, transBackgroundStyles]}
     >
-      <Text
-        style={[
-          transFontStyles,
-          {
-            fontWeight: '400',
-            fontSize: FONT_SIZE.md,
-          },
-        ]}
-      >
-        {data.name}
-      </Text>
+      <Text style={[transFontStyles]}>{data.name}</Text>
     </TouchableOpacity>
   );
 }

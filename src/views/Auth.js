@@ -3,13 +3,13 @@
 import { useNavigation } from '@react-navigation/native';
 import { request } from '@src/apis';
 import { COLORS, FONT_SIZE, FONT_WEIGHT, hp, MARGIN, SPACING, wp } from '@src/assets/style/theme';
-import { BottomSheet, OauthBtn, OnBoardingLayout, Tag } from '@src/components';
-import { sex } from '@src/constants';
+import { BottomSheet, OauthBtn, OnBoardingLayout, SelectBox, Tag } from '@src/components';
+import { local, sex } from '@src/constants';
 import { arrayHelper } from '@src/helpers';
 import { bottomSheetSlice, userSlice } from '@src/slices';
 import { empty, wait } from '@src/utils';
 import React from 'react';
-import { TouchableOpacity, SafeAreaView, Text, View, TextInput, Alert, StyleSheet, Animated } from 'react-native';
+import { TouchableOpacity, SafeAreaView, Text, View, TextInput, Alert, StyleSheet, Animated, ScrollView, Platform } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -20,8 +20,8 @@ const initValue = {
   phoneNumber: '',
   certNumber: '',
   nickname: '',
-  age: 0,
-  local: '',
+  age: 45,
+  local: local,
   sex: sex,
 };
 
@@ -43,6 +43,21 @@ function Auth() {
   });
 
   const [userInfo, setUserInfo] = React.useState(initValue);
+  const [userAge, setUserAge] = React.useState(0);
+  React.useEffect(() => {
+    let tmpAge = [];
+    for (let i = 1950; i <= 2022; i++) {
+      if (Platform.OS === 'ios') {
+        tmpAge.push(String(i));
+      } else {
+        tmpAge.push({
+          label: `${i}년`,
+          value: i,
+        });
+      }
+    }
+    setUserAge(tmpAge);
+  }, []);
   const [disabled1, disabled2] = React.useMemo(() => {
     const { certNumber, phoneNumber } = userInfo;
     const one = phoneNumber.length === 0 ? true : false;
@@ -123,10 +138,10 @@ function Auth() {
      */
     다음회원정보받기팝업보여줘(3);
   }, [userInfo, 다음회원정보받기팝업보여줘]);
-  const 성별클릭시 = React.useCallback(
-    (value) => {
+  const 체크박스체크시 = React.useCallback(
+    (value, keyName) => {
       const cloneUserInfo = { ...userInfo };
-      cloneUserInfo.sex = cloneUserInfo.sex.map((item) => {
+      cloneUserInfo[keyName] = cloneUserInfo[keyName].map((item) => {
         if (item.value === value) {
           item.check = !item.check;
         } else {
@@ -179,7 +194,7 @@ function Auth() {
       const initialState = {
         code: `A0${next}`,
         options: {
-          height: next === 3 ? 시트높이 * 2 : 시트높이,
+          height: next === 3 ? 시트높이 * 2.5 : 시트높이,
         },
       };
 
@@ -380,7 +395,7 @@ function Auth() {
                */
               A03: (
                 <OnBoardingLayout disabled={disabled3} onPress={기본정보받았다} text="가입 완료">
-                  <View style={{ height: 시트컨텐츠높이 * 2.8 }}>
+                  <View style={{ height: 시트컨텐츠높이 * 3.8 }}>
                     <Text style={styles.des}>기본정보를 입력해주세요</Text>
                     <View style={{ marginTop: MARGIN.xxxl, height: '65%', justifyContent: 'space-between' }}>
                       <View>
@@ -395,6 +410,30 @@ function Auth() {
                         />
                       </View>
                       <View>
+                        <Text style={styles.inputDes}>지역</Text>
+                        <ScrollView horizontal={true} style={{ flexDirection: 'row', marginTop: 6 }}>
+                          {userInfo.local.map((item) => {
+                            return (
+                              <Tag
+                                data={item}
+                                key={`tag-${item.value}`}
+                                onPress={체크박스체크시.bind(this, item.value, 'local')}
+                                colorStyle={{
+                                  activeBackgroundColor: COLORS.grey800,
+                                  activeColor: '#fff',
+                                  inActiveBackgroundColor: COLORS.grey50,
+                                  inActiveColor: COLORS.grey600,
+                                }}
+                              />
+                            );
+                          })}
+                        </ScrollView>
+                      </View>
+                      <View>
+                        <Text style={styles.inputDes}>나이</Text>
+                        <SelectBox list={userAge} onValueChange={() => {}} selectedValue={userInfo.age} />
+                      </View>
+                      <View>
                         <Text style={styles.inputDes}>성별</Text>
                         <View style={{ flexDirection: 'row', marginTop: 6 }}>
                           {userInfo.sex.map((item) => {
@@ -402,7 +441,7 @@ function Auth() {
                               <Tag
                                 data={item}
                                 key={`tag-${item.value}`}
-                                onPress={성별클릭시.bind(this, item.value)}
+                                onPress={체크박스체크시.bind(this, item.value, 'sex')}
                                 colorStyle={{
                                   activeBackgroundColor: COLORS.grey800,
                                   activeColor: '#fff',
