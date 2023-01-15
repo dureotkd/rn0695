@@ -6,9 +6,15 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { DefaultTheme, NavigationContainer, useNavigation } from '@react-navigation/native';
 
-import { Auth, Chat, Main, User } from '@src/views';
-import { Pressable, StyleSheet } from 'react-native';
+import { Auth, Chat, Heart, Main, User } from '@src/views';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
+
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import { COLORS, FONT_SIZE, hp, wp } from '@src/assets/style/theme';
+import { Modal, ToastMessage } from '@src/components';
+import { modalSlice, toastMessageSlice } from '@src/slices';
+import { empty } from '@src/utils';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -16,18 +22,44 @@ const navigationTheme = {
   ...DefaultTheme,
   colors: {
     color: '#000',
-    background: '#f0e7db',
+    background: COLORS.bg,
   },
 };
 
 function AppIndex() {
   const dispatch = useDispatch();
 
-  const { user } = useSelector((state) => {
+  const { user, modal, toastMessage } = useSelector((state) => {
     return state;
   });
 
-  return <NavigationContainer theme={navigationTheme}>{user.seq ? <LoginedNavi /> : <NonLoginedNavi />}</NavigationContainer>;
+  React.useEffect(() => {
+    if (empty(user.seq)) {
+      return;
+    }
+
+    dispatch(toastMessageSlice.actions.show('로그인 되었습니다'));
+  }, [dispatch, user.seq]);
+
+  return (
+    <NavigationContainer theme={navigationTheme}>
+      {user.seq ? <LoginedNavi /> : <NonLoginedNavi />}
+
+      {toastMessage.show && <ToastMessage message={toastMessage.message} />}
+
+      {modal.code && (
+        <Modal
+          confirm
+          modalVisible={true}
+          title={modal.title}
+          subTitle={modal.subTitle}
+          _permission={() => {
+            dispatch(modalSlice.actions.hide());
+          }}
+        />
+      )}
+    </NavigationContainer>
+  );
 }
 
 /**
@@ -110,6 +142,27 @@ const LoginedNavi = () => {
       },
     },
     {
+      name: 'Heart',
+      component: Heart,
+      options: {
+        tabBarIcon: ({ focused }) => {
+          const name = focused ? 'heart' : 'hearto';
+
+          return (
+            <Pressable
+              onPress={() => {
+                navigation.navigate('Heart');
+              }}
+            >
+              <Text>
+                <AntDesign name={name} size={wp('6.25%')} />
+              </Text>
+            </Pressable>
+          );
+        },
+      },
+    },
+    {
       name: 'Chat',
       component: Chat,
       options: {
@@ -157,9 +210,11 @@ const LoginedNavi = () => {
         headerTitle: '',
         headerStyle: { elevation: 0, shadowOpacity: 0 },
         tabBarShowLabel: false,
+        tabBarBadgeStyle: {},
         tabBarStyle: {
           borderTopWidth: 0,
           elevation: 0,
+          height: hp('11%'),
         },
       }}
     >
@@ -173,7 +228,7 @@ const LoginedNavi = () => {
 
 const styles = StyleSheet.create({
   tabIcon: {
-    width: 28,
+    width: wp('7%'),
     aspectRatio: 1,
   },
 });

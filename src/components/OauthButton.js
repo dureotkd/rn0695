@@ -1,43 +1,43 @@
+/* eslint-disable react-native/no-inline-styles */
+import { FONT_SIZE, hp, MARGIN, wp } from '@src/assets/style/theme';
 import React, { useEffect } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 
-import { COLORS, FONT_SIZE, hp, MARGIN } from '@assets/style/theme';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const OauthBtn = (props) => {
   return (
-    <View
+    <TouchableOpacity
+      activeOpacity={0.4}
+      onPress={props.event}
       style={{
-        alignItems: 'center',
-        backgroundColor: props.bgColor,
-        width: '85%',
-        height: 60,
-        borderRadius: 30,
+        height: hp('7%'),
+        width: wp('90%'),
         alignItems: 'center',
         justifyContent: 'center',
+        borderRadius: 30,
+        ...props.style,
       }}
     >
-      <TouchableOpacity activeOpacity={0.4} style={{ marginRight: props.loading ? 0 : 8 }} onPress={props.event}>
-        {props.loading ? (
-          <ActivityIndicator />
-        ) : (
-          <View style={styles.wrap}>
-            <FastImage
-              style={[
-                {
-                  width: 35,
-                  aspectRatio: 1,
-                  marginRight: 5,
-                },
-              ]}
-              source={props.logo}
-            />
-            <Text style={{ fontSize: 20, fontWeight: '600' }}>{props.text}</Text>
-          </View>
-        )}
-      </TouchableOpacity>
-    </View>
+      {props.loading ? (
+        <ActivityIndicator />
+      ) : (
+        <View style={styles.wrap}>
+          <FastImage
+            style={[
+              {
+                width: wp('8%'),
+                aspectRatio: 1,
+                marginRight: MARGIN.md,
+              },
+            ]}
+            source={props.logo}
+          />
+          <Text style={{ fontSize: FONT_SIZE.xl, fontWeight: '600', color: props.color }}>{props.text}</Text>
+        </View>
+      )}
+    </TouchableOpacity>
   );
 };
 

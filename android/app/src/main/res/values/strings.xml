@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">군개팅 - [군인을 위한 소개팅 어플]</string>
+    <string name="kakao_app_key">520907959fdd9422cab7975a577288e6</string>
 </resources>

@@ -1,3 +1,5 @@
 import request from './request';
 
-export { request };
+import oauthApi from './oauth';
+
+export { request, oauthApi };

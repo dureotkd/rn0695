@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import { useNavigation } from '@react-navigation/native';
-import { request } from '@src/apis';
+import { oauthApi, request } from '@src/apis';
 import { COLORS, FONT_SIZE, FONT_WEIGHT, hp, MARGIN, SPACING, wp } from '@src/assets/style/theme';
 import { BottomSheet, OauthBtn, OnBoardingLayout, SelectBox, Tag } from '@src/components';
 import { local, sex } from '@src/constants';
@@ -13,8 +13,11 @@ import { TouchableOpacity, SafeAreaView, Text, View, TextInput, Alert, StyleShee
 import FastImage from 'react-native-fast-image';
 import { useDispatch, useSelector } from 'react-redux';
 
-const 시트컨텐츠높이 = hp('18%');
-const 시트높이 = hp('33.5%');
+const 안드로이드컨텐츠높이더하기 = Platform.OS === 'android' ? 50 : 0;
+const 안드로이드시트높이더하기 = Platform.OS === 'android' ? 80 : 0;
+
+const 시트컨텐츠높이 = hp('18%') + 안드로이드컨텐츠높이더하기;
+const 시트높이 = hp('33.5%') + 안드로이드시트높이더하기;
 
 const initValue = {
   phoneNumber: '',
@@ -37,6 +40,7 @@ function Auth() {
   const dispatch = useDispatch();
   const [btnLoading, setBtnLoading] = React.useState({
     kakao: false,
+    apple: false,
   });
   const { bottomSheet } = useSelector((state) => {
     return state;
@@ -46,15 +50,11 @@ function Auth() {
   const [userAge, setUserAge] = React.useState(0);
   React.useEffect(() => {
     let tmpAge = [];
-    for (let i = 1950; i <= 2022; i++) {
-      if (Platform.OS === 'ios') {
-        tmpAge.push(String(i));
-      } else {
-        tmpAge.push({
-          label: `${i}년`,
-          value: i,
-        });
-      }
+    for (let i = 19; i <= 50; i++) {
+      tmpAge.push({
+        label: `${i}`,
+        value: i,
+      });
     }
     setUserAge(tmpAge);
   }, []);
@@ -194,7 +194,7 @@ function Auth() {
       const initialState = {
         code: `A0${next}`,
         options: {
-          height: next === 3 ? 시트높이 * 2.5 : 시트높이,
+          height: next === 3 ? hp('90%') : 시트높이,
         },
       };
 
@@ -277,12 +277,14 @@ function Auth() {
     인증번호타이머시작();
   }, [bottomSheet.code]);
 
+  const { kakaoApi } = oauthApi({ setUserInfo, setModaldVisible });
+
   return (
     <SafeAreaView style={{ height: '100%' }}>
       <View style={{ padding: SPACING.layout }}>
         <Text style={{ fontSize: FONT_SIZE.xl }}>군개팅 - 로고</Text>
       </View>
-      <View style={{ alignItems: 'center', justifyContent: 'center', flex: 0.75 }}>
+      <View style={{ alignItems: 'center', justifyContent: 'center', flex: 0.7 }}>
         <FastImage style={{ width: wp('70'), height: wp('50') }} source={require('@assets/image/couple.png')} />
         <View style={{ marginTop: MARGIN.xxl, justifyContent: 'center', alignItems: 'center' }}>
           <Text style={styles.bannerText}>
@@ -303,14 +305,27 @@ function Auth() {
           <Text style={styles.bannerText}>소개팅</Text>
         </View>
       </View>
-      <View style={{ flex: 0.25, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 0.3, justifyContent: 'center', alignItems: 'center' }}>
         <OauthBtn
           text="카카오 로그인"
           logo={require('@assets/image/kakao_login_icon.png')}
           bgColor="#FEE500"
           loading={btnLoading.kakao}
-          event={() => {}}
+          event={kakaoApi}
+          style={{ backgroundColor: '#FEE500' }}
         />
+        {Platform.OS === 'ios' && (
+          <OauthBtn
+            text="Apple 로그인"
+            logo={require('@assets/image/apple_logo.png')}
+            loading={btnLoading.apple}
+            event={() => {
+              console.log('zzbb');
+            }}
+            color="#fff"
+            style={{ marginTop: 12, backgroundColor: '#000' }}
+          />
+        )}
         <TouchableOpacity
           onPress={전화번호로그인팝업보여줘}
           activeOpacity={0.4}
@@ -324,6 +339,7 @@ function Auth() {
           modalVisible={modaldVisible}
           setModalVisible={setModaldVisible}
           bottomSheetDown={bottomSheetDown}
+          avoidKeyboard={bottomSheet.code === 'A03' ? false : true}
           {...bottomSheet.options}
         >
           {
@@ -395,9 +411,9 @@ function Auth() {
                */
               A03: (
                 <OnBoardingLayout disabled={disabled3} onPress={기본정보받았다} text="가입 완료">
-                  <View style={{ height: 시트컨텐츠높이 * 3.8 }}>
+                  <View style={{ height: Platform.OS === 'ios' ? hp('74%') : hp('70%') }}>
                     <Text style={styles.des}>기본정보를 입력해주세요</Text>
-                    <View style={{ marginTop: MARGIN.xxxl, height: '65%', justifyContent: 'space-between' }}>
+                    <View style={{ marginTop: MARGIN.xxxl, height: '70%', justifyContent: 'space-between' }}>
                       <View>
                         <Text style={styles.inputDes}>닉네임</Text>
                         <TextInput
@@ -411,27 +427,31 @@ function Auth() {
                       </View>
                       <View>
                         <Text style={styles.inputDes}>지역</Text>
-                        <ScrollView horizontal={true} style={{ flexDirection: 'row', marginTop: 6 }}>
-                          {userInfo.local.map((item) => {
-                            return (
-                              <Tag
-                                data={item}
-                                key={`tag-${item.value}`}
-                                onPress={체크박스체크시.bind(this, item.value, 'local')}
-                                colorStyle={{
-                                  activeBackgroundColor: COLORS.grey800,
-                                  activeColor: '#fff',
-                                  inActiveBackgroundColor: COLORS.grey50,
-                                  inActiveColor: COLORS.grey600,
-                                }}
-                              />
-                            );
-                          })}
-                        </ScrollView>
+                        <SelectBox
+                          list={userInfo.local}
+                          placeholder={{
+                            label: '지역 선택',
+                            inputLabel: '지역 선택',
+                            value: '',
+                            key: 1,
+                          }}
+                          onValueChange={() => {}}
+                          selectedValue={userInfo.age}
+                        />
                       </View>
                       <View>
                         <Text style={styles.inputDes}>나이</Text>
-                        <SelectBox list={userAge} onValueChange={() => {}} selectedValue={userInfo.age} />
+                        <SelectBox
+                          list={userAge}
+                          placeholder={{
+                            label: '나이 선택',
+                            inputLabel: '나이 선택',
+                            value: '',
+                            key: 1,
+                          }}
+                          onValueChange={() => {}}
+                          selectedValue={userInfo.age}
+                        />
                       </View>
                       <View>
                         <Text style={styles.inputDes}>성별</Text>
@@ -446,7 +466,7 @@ function Auth() {
                                   activeBackgroundColor: COLORS.grey800,
                                   activeColor: '#fff',
                                   inActiveBackgroundColor: COLORS.grey50,
-                                  inActiveColor: COLORS.grey600,
+                                  inActiveColor: COLORS.grey800,
                                 }}
                               />
                             );

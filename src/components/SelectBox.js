@@ -1,30 +1,59 @@
+import commonStyles from '@src/assets/style/common';
+import { COLORS, FONT_SIZE, MARGIN, wp } from '@src/assets/style/theme';
 import React from 'react';
 import { Platform } from 'react-native';
 
 import RNPickerSelect from 'react-native-picker-select';
+
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+
 // IOS
 // const PickerItem = Picker.Item;
 
 // Android
 // import RNPickerSelect from 'react-native-picker-select';
 
-function SelectBox({ list, selectedValue, onValueChange, style, textColor = '#fff' }) {
+function SelectBox({ list, placeholder, selectedValue, onValueChange, style, textColor = '#fff' }) {
   React.useEffect(() => {}, []);
 
   return (
     <React.Fragment>
-      {/* <Picker textColor={textColor} style={{ ...style }} onValueChange={onValueChange} selectedValue={selectedValue}>
-        {list.map((value, i) => (Picker
-          <PickerItem label={value} value={i} key={i} />
-        ))}
-      </Picker> */}
       <RNPickerSelect
+        items={list}
+        placeholder={placeholder}
         onValueChange={(value) => console.log(value)}
-        items={[
-          { label: '전체', value: '전체' },
-          { label: '진행중', value: '진행중' },
-          { label: '마감', value: '마감' },
-        ]}
+        onDonePress={() => {
+          console.log(`확인누를`);
+        }}
+        style={{
+          placeholder: { color: COLORS.grey800, backgroundColor: COLORS.grey50 },
+          inputIOS: {
+            ...commonStyles.selectBox,
+            backgroundColor: COLORS.grey800,
+            color: '#fff',
+          },
+          inputAndroid: {
+            ...commonStyles.selectBox,
+            backgroundColor: COLORS.grey800,
+            color: '#fff',
+          },
+          inputIOSContainer: {
+            marginTop: MARGIN.sm,
+            width: wp('30%'),
+            justifyContent: 'center',
+          },
+          inputAndroidContainer: {
+            marginTop: MARGIN.sm,
+            width: wp('30%'),
+            justifyContent: 'center',
+          },
+        }}
+        fixAndroidTouchableBug={true}
+        useNativeAndroidPickerStyle={false}
+        Icon={() => {
+          return <AntDesign name="down" size={16} color={COLORS.grey400} style={{ marginRight: MARGIN.xxxl, marginTop: MARGIN.md }} />;
+        }}
       />
     </React.Fragment>
   );

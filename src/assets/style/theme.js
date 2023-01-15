@@ -2,6 +2,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 
 const COLORS = {
   black: '#000',
+  bg: '#f0e7db',
   orange10: '#FFF5EC',
   orange50: '#FFEBD2',
   orange100: '#FFD0A4',
@@ -18,7 +19,7 @@ const COLORS = {
   grey600: '#616161',
   grey700: '#424242',
   grey800: '#212121',
-  primary: '#FF5E1F',
+  primary: '#536349',
   lightRed: '#ED4F4F',
   lightBlack: '#212121',
   secondary: '#FFCC00',

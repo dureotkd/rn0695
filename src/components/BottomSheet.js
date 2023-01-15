@@ -1,9 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
-import { COLORS } from '@src/assets/style/theme';
+import { COLORS, wp } from '@src/assets/style/theme';
 import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Modal, Animated, Dimensions, PanResponder, Pressable, ScrollView, Text } from 'react-native';
+import { View, StyleSheet, Animated, Dimensions, PanResponder, Pressable, ScrollView, Text, Keyboard, Platform } from 'react-native';
+import Modal from 'react-native-modal';
 
-const BottomSheet = ({ modalVisible, setModalVisible, bottomSheetDown, height, children, buttonComponent }) => {
+const BottomSheet = ({ modalVisible, setModalVisible, avoidKeyboard, bottomSheetDown, height, children, buttonComponent }) => {
   const screenHeight = Dimensions.get('screen').height;
   const panY = useRef(new Animated.Value(screenHeight)).current;
 
@@ -89,13 +90,43 @@ const BottomSheet = ({ modalVisible, setModalVisible, bottomSheetDown, height, c
     }
   };
 
+  const [keyboardHeight, setKeyboardHeight] = React.useState(0);
+
+  React.useEffect(() => {
+    if (Platform.OS === 'ios') {
+      return;
+    }
+
+    function onKeyboardDidShow(e) {
+      // Remove type here if not using TypeScript
+      if (keyboardHeight > 0) {
+        return;
+      }
+
+      setKeyboardHeight(e.endCoordinates.height);
+    }
+
+    function onKeyboardDidHide() {
+      setKeyboardHeight(0);
+    }
+
+    const showSubscription = Keyboard.addListener('keyboardDidShow', onKeyboardDidShow);
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', onKeyboardDidHide);
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
+
+  const resultHeight = avoidKeyboard ? height + keyboardHeight : height;
+
   return (
-    <Modal visible={modalVisible} animationType={'fade'} transparent statusBarTranslucent>
+    <Modal deviceWidth={1} avoidKeyboard={avoidKeyboard} visible={modalVisible} animationType={'fade'} transparent statusBarTranslucent>
       <Pressable onPress={closeTouchModal} style={styles.overlay}>
         <Animated.View
           style={{
             ...styles.bottomSheetContainer,
-            height: height,
+            height: resultHeight,
             transform: [{ translateY: translateY }],
           }}
           {...panResponders.panHandlers}

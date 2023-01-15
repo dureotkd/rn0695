@@ -1,3 +1,5 @@
+/* eslint-disable react-native/no-inline-styles */
+import { COLORS } from '@src/assets/style/theme';
 import React from 'react';
 import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
 
@@ -10,7 +12,7 @@ function OnBoardingLayout({ children, onPress, disabled, text = '다음' }) {
         disabled={disabled}
         activeOpacity={0.4}
         style={{
-          backgroundColor: disabled ? '#bdbdbd' : '#536349',
+          backgroundColor: disabled ? COLORS.grey300 : COLORS.primary,
           padding: 12,
           height: 60,
           borderRadius: 50,
