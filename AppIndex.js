@@ -18,7 +18,6 @@ import { empty, wait } from '@src/utils';
 
 import Reactotron from 'reactotron-react-native';
 import { request } from '@src/apis';
-import { useErrorHandler } from 'react-error-boundary';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -36,8 +35,6 @@ function AppIndex() {
   const { user, modal, toastMessage } = useSelector((state) => {
     return state;
   });
-
-  const handleError = useErrorHandler();
 
   React.useEffect(() => {
     (async () => {})();

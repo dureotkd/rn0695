@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import Reactotron from 'reactotron-react-native';
 import { showModal } from '@src/slices/modal';
+import { SafeAreaView, Text } from 'react-native';
 
 // class ErrorBoundary extends React.Component {
 //   state = { error: false };
@@ -47,9 +48,11 @@ class ErrorBoundries extends React.Component {
   }
 
   render() {
-    const { hasError } = this.state;
+    const { hasError, error } = this.props;
 
-    console.log(hasError);
+    if (hasError) {
+      return this.props.children;
+    }
 
     return this.props.children;
   }

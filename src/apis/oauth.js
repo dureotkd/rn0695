@@ -65,8 +65,6 @@ const OauthApi = ({ setUserInfo, setModaldVisible }) => {
        * 비정상적으로 에러발생시 팝업
        */
 
-      throw new Error('zzzz');
-
       /**
        * 그냥 닫기로 취급한 에러는 팝업 안보여줌
        */

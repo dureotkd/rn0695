@@ -12,57 +12,11 @@ import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
 
 import { ErrorBoundary, useErrorHandler } from 'react-error-boundary';
 
-const Test = () => {
-  const handleError = useErrorHandler();
-
-  React.useEffect(() => {
-    (async () => {
-      try {
-        await request.get('zzsda,ld,l');
-      } catch (error) {
-        handleError(error);
-      }
-    })();
-  }, []);
-
-  return (
-    <SafeAreaView>
-      <Text>a</Text>
-    </SafeAreaView>
-  );
-};
-
 const App = () => {
   return (
-    <ErrorBoundary
-      onReset={() => {
-        console.log('Reset');
-      }}
-      fallbackRender={({ error, resetErrorBoundary }) => {
-        return (
-          <SafeAreaView>
-            <TouchableOpacity onPress={resetErrorBoundary}>
-              <Text>{error.message}</Text>
-              <Text style={{ color: 'red' }}>ErrorErrorErrorErrorErrorError</Text>
-            </TouchableOpacity>
-          </SafeAreaView>
-        );
-      }}
-    >
-      <Provider store={store}>
-        <Suspense
-          fallback={() => {
-            return (
-              <SafeAreaView>
-                <Text style={{ color: 'blue', color: 'red' }}>Loading...!</Text>
-              </SafeAreaView>
-            );
-          }}
-        >
-          <AppIndex />
-        </Suspense>
-      </Provider>
-    </ErrorBoundary>
+    <Provider store={store}>
+      <AppIndex />
+    </Provider>
   );
 };
 

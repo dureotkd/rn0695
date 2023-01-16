@@ -1,15 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import { useNavigation } from '@react-navigation/native';
-import { oauthApi, request } from '@src/apis';
+import { apiErrorHandler, oauthApi, request } from '@src/apis';
 import { COLORS, FONT_SIZE, FONT_WEIGHT, hp, MARGIN, SPACING, wp } from '@src/assets/style/theme';
 import { BottomSheet, OauthBtn, OnBoardingLayout, SelectBox, Tag } from '@src/components';
 import { local, sex } from '@src/constants';
-import { arrayHelper } from '@src/helpers';
-import { bottomSheetSlice, userSlice } from '@src/slices';
+import { bottomSheetSlice, modalSlice, userSlice } from '@src/slices';
 import { ca, empty, wait } from '@src/utils';
-import React from 'react';
-import { useErrorHandler } from 'react-error-boundary';
+import React, { Suspense } from 'react';
 import { TouchableOpacity, SafeAreaView, Text, View, TextInput, Alert, StyleSheet, Animated, ScrollView, Platform } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useDispatch, useSelector } from 'react-redux';
@@ -39,8 +37,6 @@ const timeGlobalInterval = {
 };
 
 function Auth() {
-  const handleError = useErrorHandler();
-
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [btnLoading, setBtnLoading] = React.useState({
@@ -94,37 +90,42 @@ function Auth() {
       };
     });
   }, []);
-  const 전화번호받았다 = React.useCallback(async () => {
-    /**
-     * 번호 유효성 체크
-     */
+  const 전화번호받았다 = React.useCallback(
+    async (type) => {
+      /**
+       * 번호 유효성 체크
+       */
 
-    const { phoneNumber = '' } = userInfo;
+      const { phoneNumber = '' } = userInfo;
 
-    if (empty(phoneNumber)) {
-      Alert.alert('전화번호를 입력해주세요');
-      return;
-    }
+      if (empty(phoneNumber) && type !== 'retry') {
+        Alert.alert('전화번호를 입력해주세요');
+        return;
+      }
 
-    /**
-     * SMS 전송하기
-     */
-    // await request
-    //   .post('/user/sms/login', {
-    //     data: phoneNumber,
-    //   })
-    //   .then((res) => {})
-    //   .catch((err) => {});
+      /**
+       * SMS 전송하기
+       */
+      await request
+        .post('/sms/cert', {
+          phoneNumber: phoneNumber,
+        })
+        .then((res) => {})
+        .catch(() => {
+          apiErrorHandler(dispatch);
+        });
 
-    /**
-     * 다음 페이지로 이동
-     */
-    다음회원정보받기팝업보여줘(2);
-  }, [userInfo, 다음회원정보받기팝업보여줘]);
+      /**
+       * 다음 페이지로 이동
+       */
+      다음회원정보받기팝업보여줘(2);
+    },
+    [userInfo, 다음회원정보받기팝업보여줘],
+  );
   const 인증번호재전송 = React.useCallback(async () => {
-    인증번호타이머시작();
-
+    전화번호받았다('retry');
     Alert.alert('재전송 되었습니다');
+    인증번호타이머시작();
     setUserInfo((prev) => {
       return {
         ...prev,
@@ -200,19 +201,20 @@ function Auth() {
      */
     const { phoneNumber, nickname, selectAgeValue, selectLocalValue } = userInfo;
 
-    try {
-      await request
-        .post('/login', {
-          phoneNumber: phoneNumber,
-          nickname: nickname,
-          age: selectAgeValue,
-          sex: selectSexValue,
-          local: selectLocalValue,
-        })
-        .then((res) => {
-          ca.log(res);
-        });
-    } catch (error) {}
+    await request
+      .post('/login', {
+        phoneNumber: phoneNumber,
+        nickname: nickname,
+        age: selectAgeValue,
+        sex: selectSexValue,
+        local: selectLocalValue,
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch(() => {
+        apiErrorHandler(dispatch);
+      });
   }, [dispatch, userInfo]);
 
   const [modaldVisible, setModaldVisible] = React.useState(false);
@@ -223,7 +225,7 @@ function Auth() {
     }
     setUserInfo(initValue);
   }, [modaldVisible]);
-  const 전화번호로그인팝업보여줘 = React.useCallback(() => {
+  const 전화번호로그인팝업보여줘 = React.useCallback(async () => {
     setModaldVisible(true);
     setBottomSheetDown(false);
     dispatch(
