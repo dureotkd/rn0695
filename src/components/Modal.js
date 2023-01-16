@@ -1,14 +1,16 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { Modal as ReactModal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal as ReactModal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { COLORS, FONT_SIZE, hp, MARGIN, SPACING, wp } from '@src/assets/style/theme';
 
 function Modal({ modalVisible, renderComponent, confirm, _deny, _permission, title, subTitle, denyText, permissionText }) {
   const RenderComponent = renderComponent;
   const resPermissionText = permissionText || '확인';
 
+  console.log('2');
+
   return (
-    <ReactModal animationType="fade" transparent={true} visible={modalVisible}>
+    <ReactModal style={{ zIndex: 10000 }} animationType="fade" transparent={true} visible={modalVisible}>
       {confirm ? (
         <View style={styles.overLay}>
           <View style={styles.modalBox}>
@@ -108,7 +110,8 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.50)',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    zIndex: 10000,
   },
   modalBox: {
     width: wp('80%'),

@@ -1,10 +1,16 @@
 import axios from 'axios';
+import { Alert } from 'react-native';
 
 // ==================================== 요청 ======================================
 
+/**
+ * SERVER WIFI : 192.168.35.217
+ * localhost
+ *
+ */
 const instance = axios.create({
-  baseURL: 'http://localhost:4000',
-  timeout: 6000,
+  baseURL: 'http://192.168.35.217:4000',
+  timeout: 5000,
   maxRedirects: 0,
   withCredentials: true,
 });
@@ -34,6 +40,10 @@ instance.interceptors.response.use(
     // 응답 로직 생성
     response,
   ) => {
+    if (response.code === 'error' && response.message) {
+      Alert.alert(response.message);
+    }
+
     return response;
   },
 

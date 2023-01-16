@@ -7,17 +7,18 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { DefaultTheme, NavigationContainer, useNavigation } from '@react-navigation/native';
 
 import { Auth, Chat, Heart, Main, User } from '@src/views';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { COLORS, FONT_SIZE, hp, wp } from '@src/assets/style/theme';
 import { Modal, ToastMessage } from '@src/components';
-import { modalSlice, toastMessageSlice } from '@src/slices';
-import { empty, wait } from '@src/utils';
+import { modalSlice, toastMessageSlice, userSlice } from '@src/slices';
+import { ca, empty, wait } from '@src/utils';
 
 import Reactotron from 'reactotron-react-native';
-import { request } from '@src/apis';
+import { apiErrorHandler, request } from '@src/apis';
+import PageLoading from '@src/components/PageLoading';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -26,6 +27,7 @@ const navigationTheme = {
   colors: {
     color: '#000',
     background: COLORS.bg,
+    backgroundColor: COLORS.bg,
   },
 };
 
@@ -36,20 +38,42 @@ function AppIndex() {
     return state;
   });
 
-  React.useEffect(() => {
-    (async () => {})();
-  }, []);
+  const [loading, setLoading] = React.useState(true);
 
   /**
    * 로그인 처리
    */
   React.useEffect(() => {
-    if (empty(user.seq)) {
-      return;
-    }
+    (async () => {
+      const {
+        data: { loginUser },
+      } = await request
+        .get('/login')
+        .then((res) => res)
+        .catch(() => {
+          setLoading((prev) => !prev);
+          apiErrorHandler(dispatch);
+        });
 
-    dispatch(toastMessageSlice.actions.show('로그인 되었습니다'));
-  }, [dispatch, user.seq]);
+      setLoading((prev) => !prev);
+
+      if (!loginUser) {
+        return;
+      }
+
+      dispatch(
+        userSlice.actions.login({
+          loginUser: loginUser,
+        }),
+      );
+
+      dispatch(toastMessageSlice.actions.show('로그인 되었습니다'));
+    })();
+  }, [dispatch]);
+
+  if (loading) {
+    return <PageLoading />;
+  }
 
   return (
     <NavigationContainer theme={navigationTheme}>

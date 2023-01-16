@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import { useNavigation } from '@react-navigation/native';
 import { apiErrorHandler, oauthApi, request } from '@src/apis';
@@ -7,6 +6,7 @@ import { BottomSheet, OauthBtn, OnBoardingLayout, SelectBox, Tag } from '@src/co
 import { local, sex } from '@src/constants';
 import { bottomSheetSlice, modalSlice, userSlice } from '@src/slices';
 import { ca, empty, wait } from '@src/utils';
+import axios from 'axios';
 import React, { Suspense } from 'react';
 import { TouchableOpacity, SafeAreaView, Text, View, TextInput, Alert, StyleSheet, Animated, ScrollView, Platform } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -64,6 +64,7 @@ function Auth() {
     const one = phoneNumber.length === 0 ? true : false;
     const two = certNumber.length === 0 ? true : false;
     return [one, two];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userInfo.phoneNumber, userInfo.certNumber]);
 
   const disabled3 = React.useMemo(() => {
@@ -90,41 +91,45 @@ function Auth() {
       };
     });
   }, []);
-  const 전화번호받았다 = React.useCallback(
-    async (type) => {
-      /**
-       * 번호 유효성 체크
-       */
+  const 번호받았으니인증번호보내자 = React.useCallback(async () => {
+    /**
+     * 번호 유효성 체크
+     */
+    const { phoneNumber = '' } = userInfo;
 
-      const { phoneNumber = '' } = userInfo;
+    if (empty(phoneNumber)) {
+      Alert.alert('전화번호를 입력해주세요');
+      return;
+    }
 
-      if (empty(phoneNumber) && type !== 'retry') {
-        Alert.alert('전화번호를 입력해주세요');
-        return;
-      }
+    await 인증번번호API();
 
-      /**
-       * SMS 전송하기
-       */
-      await request
-        .post('/sms/cert', {
-          phoneNumber: phoneNumber,
-        })
-        .then((res) => {})
-        .catch(() => {
-          apiErrorHandler(dispatch);
-        });
+    /**
+     * 다음 페이지로 이동
+     */
+    다음회원정보받기팝업보여줘(2);
+  }, [userInfo, 다음회원정보받기팝업보여줘, 인증번번호API]);
 
-      /**
-       * 다음 페이지로 이동
-       */
-      다음회원정보받기팝업보여줘(2);
-    },
-    [userInfo, 다음회원정보받기팝업보여줘],
-  );
+  const 인증번번호API = React.useCallback(async () => {
+    const { phoneNumber = '' } = userInfo;
+
+    /**
+     * SMS 전송하기
+     */
+    await request
+      .post('/sms/cert', {
+        phoneNumber: phoneNumber,
+      })
+      .then((res) => {})
+      .catch(() => {
+        setModaldVisible((prev) => !prev);
+        apiErrorHandler(dispatch);
+      });
+  }, [dispatch, userInfo]);
+
   const 인증번호재전송 = React.useCallback(async () => {
-    전화번호받았다('retry');
     Alert.alert('재전송 되었습니다');
+    await 인증번번호API();
     인증번호타이머시작();
     setUserInfo((prev) => {
       return {
@@ -132,7 +137,8 @@ function Auth() {
         certNumber: '',
       };
     });
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [번호받았으니인증번호보내자]);
   const 인증번호받았다 = React.useCallback(async () => {
     const { certNumber } = userInfo;
     if (empty(certNumber)) {
@@ -142,8 +148,26 @@ function Auth() {
     /**
      * 인증번호 검증
      */
+    const { code } = await request
+      .get('/sms/cert', {
+        params: {
+          certNumber: certNumber,
+        },
+      })
+      .then(({ data }) => {
+        return data;
+      })
+      .catch(() => {
+        setModaldVisible((prev) => !prev);
+        apiErrorHandler(dispatch);
+      });
+
+    if (code !== 'success') {
+      return;
+    }
+
     다음회원정보받기팝업보여줘(3);
-  }, [userInfo, 다음회원정보받기팝업보여줘]);
+  }, [dispatch, userInfo, 다음회원정보받기팝업보여줘]);
   const 성별체크박스체크시 = React.useCallback(
     (value, keyName) => {
       const cloneUserInfo = { ...userInfo };
@@ -201,7 +225,7 @@ function Auth() {
      */
     const { phoneNumber, nickname, selectAgeValue, selectLocalValue } = userInfo;
 
-    await request
+    const userApiData = await request
       .post('/login', {
         phoneNumber: phoneNumber,
         nickname: nickname,
@@ -213,8 +237,11 @@ function Auth() {
         return res;
       })
       .catch(() => {
+        setModaldVisible((prev) => !prev);
         apiErrorHandler(dispatch);
       });
+
+    console.log(userApiData);
   }, [dispatch, userInfo]);
 
   const [modaldVisible, setModaldVisible] = React.useState(false);
@@ -285,6 +312,7 @@ function Auth() {
         useNativeDriver: false,
       }).start();
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [timer, setTimer] = React.useState({
@@ -326,6 +354,7 @@ function Auth() {
       return;
     }
     인증번호타이머시작();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bottomSheet.code]);
 
   /**
@@ -400,14 +429,14 @@ function Auth() {
                * 전화번호 받자
                */
               A01: (
-                <OnBoardingLayout onPress={전화번호받았다} disabled={disabled1}>
+                <OnBoardingLayout onPress={번호받았으니인증번호보내자} disabled={disabled1}>
                   <View style={{ height: 시트컨텐츠높이 }}>
                     <Text style={styles.des}>전화번호를 입력해주세요</Text>
                     <TextInput
                       autoFocus={true}
                       maxLength={11}
                       keyboardType="numeric"
-                      onSubmitEditing={전화번호받았다}
+                      onSubmitEditing={번호받았으니인증번호보내자}
                       style={styles.textInput}
                       placeholder="010-0000-0000 숫자만 입력해주세요"
                       value={userInfo.phoneNumber}

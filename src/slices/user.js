@@ -22,7 +22,15 @@ const user = createSlice({
       return state;
     },
     login(state, action) {
-      state.seq = 1;
+      const {
+        loginUser: { seq, nickname, age, phoneNumber, gender },
+      } = action.payload;
+
+      state.seq = seq;
+      state.nickname = nickname;
+      state.age = age;
+      state.phoneNumber = phoneNumber;
+      state.gender = gender;
       return state;
     },
     delete() {},
