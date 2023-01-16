@@ -277,7 +277,10 @@ function Auth() {
     인증번호타이머시작();
   }, [bottomSheet.code]);
 
-  const { kakaoApi } = oauthApi({ setUserInfo, setModaldVisible });
+  /**
+   * 소셜로그인 API
+   */
+  const { kakaoApi, appleApi } = oauthApi({ setUserInfo, setModaldVisible });
 
   return (
     <SafeAreaView style={{ height: '100%' }}>
@@ -319,9 +322,7 @@ function Auth() {
             text="Apple 로그인"
             logo={require('@assets/image/apple_logo.png')}
             loading={btnLoading.apple}
-            event={() => {
-              console.log('zzbb');
-            }}
+            event={appleApi}
             color="#fff"
             style={{ marginTop: 12, backgroundColor: '#000' }}
           />

@@ -4,6 +4,7 @@ import { bottomSheetSlice, modalSlice } from '@src/slices';
 import { empty } from '@src/utils';
 import React from 'react';
 import { useDispatch } from 'react-redux';
+import appleAuth from '@invertase/react-native-apple-authentication';
 
 const OauthApi = ({ setUserInfo, setModaldVisible }) => {
   const dispatch = useDispatch();
@@ -78,9 +79,75 @@ const OauthApi = ({ setUserInfo, setModaldVisible }) => {
         }),
       );
     }
-  }, [dispatch]);
+  }, [dispatch, setModaldVisible, setUserInfo]);
 
-  return { kakaoApi };
+  const appleApi = React.useCallback(async () => {
+    console.log('zzz');
+    try {
+      // performs login request
+      const appleAuthResponse = await appleAuth.performRequest({
+        requestedOperation: appleAuth.Operation.LOGIN,
+        requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+      });
+
+      // get current authentication state for user
+      const credentialState = await appleAuth.getCredentialStateForUser(appleAuthResponse.user);
+
+      if (credentialState !== appleAuth.State.AUTHORIZED) {
+        throw Error('signError');
+      }
+
+      const { authorizationCode, identityToken, fullName, email } = appleAuthResponse;
+
+      /**
+       * 회원가입 처리 ~
+       */
+
+      /**
+       * A03[기본정보입력] 시트로 이동
+       */
+
+      setUserInfo((prev) => {
+        const clonePrev = { ...prev };
+        clonePrev.nickname = fullName?.givenName || '';
+        return clonePrev;
+      });
+      setModaldVisible(true);
+      dispatch(
+        bottomSheetSlice.actions.set({
+          show: true,
+          code: 'A03', // 기본정보 입력으로 바로 이동
+          options: {
+            height: hp('90%'),
+          },
+        }),
+      );
+    } catch (error) {
+      const errorObj = new Error(error);
+
+      console.log(errorObj.message, errorObj.toString());
+
+      /**
+       * 그냥 닫기로 취급한 에러는 팝업 안보여줌
+       */
+      if (errorObj.toString().includes('error 1001')) {
+        return;
+      }
+
+      /**
+       * 비정상적으로 에러발생시 팝업
+       */
+      dispatch(
+        modalSlice.actions.show({
+          code: 1000,
+          title: 'zzz',
+          subTitle: 'zzzz',
+        }),
+      );
+    }
+  }, []);
+
+  return { kakaoApi, appleApi };
 };
 
 export default OauthApi;

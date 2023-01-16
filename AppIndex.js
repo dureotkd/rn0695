@@ -33,6 +33,9 @@ function AppIndex() {
     return state;
   });
 
+  /**
+   * 로그인 처리
+   */
   React.useEffect(() => {
     if (empty(user.seq)) {
       return;
