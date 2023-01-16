@@ -7,8 +7,6 @@ function Main() {
     return state.user;
   });
 
-  console.log(user);
-
   return <SafeAreaView style={{ height: '100%' }}></SafeAreaView>;
 }
 

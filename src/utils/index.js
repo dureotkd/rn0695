@@ -1,3 +1,5 @@
+import Reactotron from 'reactotron-react-native';
+
 const empty = (val) => {
   if (!val || (typeof val === 'object' && !Object.keys(val).length)) {
     return true;
@@ -22,4 +24,12 @@ const removeCommas = (x) => {
   return x.replaceAll(',', '');
 };
 
-export { empty, wait, numberWithCommas, removeCommas };
+class Console {
+  log(value) {
+    Reactotron.log(value);
+  }
+}
+
+const ca = new Console();
+
+export { empty, wait, numberWithCommas, removeCommas, ca };

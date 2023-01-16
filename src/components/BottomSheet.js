@@ -45,8 +45,6 @@ const BottomSheet = ({ modalVisible, setModalVisible, avoidKeyboard, bottomSheet
   // const backAction = () => {
   //   // closeModal();
 
-  //   console.log('??');
-
   //   return true;
   // };
 

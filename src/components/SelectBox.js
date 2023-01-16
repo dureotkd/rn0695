@@ -22,10 +22,8 @@ function SelectBox({ list, placeholder, selectedValue, onValueChange, style, tex
       <RNPickerSelect
         items={list}
         placeholder={placeholder}
-        onValueChange={(value) => console.log(value)}
-        onDonePress={() => {
-          console.log(`확인누를`);
-        }}
+        onValueChange={onValueChange}
+        onDonePress={() => {}}
         style={{
           placeholder: { color: COLORS.grey800, backgroundColor: COLORS.grey50 },
           inputIOS: {

@@ -7,7 +7,7 @@ import { BottomSheet, OauthBtn, OnBoardingLayout, SelectBox, Tag } from '@src/co
 import { local, sex } from '@src/constants';
 import { arrayHelper } from '@src/helpers';
 import { bottomSheetSlice, userSlice } from '@src/slices';
-import { empty, wait } from '@src/utils';
+import { ca, empty, wait } from '@src/utils';
 import React from 'react';
 import { TouchableOpacity, SafeAreaView, Text, View, TextInput, Alert, StyleSheet, Animated, ScrollView, Platform } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -26,6 +26,8 @@ const initValue = {
   age: 45,
   local: local,
   sex: sex,
+  selectLocalValue: '',
+  selectAgeValue: '',
 };
 
 const timeGlobalInterval = {
@@ -138,7 +140,7 @@ function Auth() {
      */
     다음회원정보받기팝업보여줘(3);
   }, [userInfo, 다음회원정보받기팝업보여줘]);
-  const 체크박스체크시 = React.useCallback(
+  const 성별체크박스체크시 = React.useCallback(
     (value, keyName) => {
       const cloneUserInfo = { ...userInfo };
       cloneUserInfo[keyName] = cloneUserInfo[keyName].map((item) => {
@@ -149,21 +151,66 @@ function Auth() {
         }
         return item;
       });
-
       setUserInfo(cloneUserInfo);
     },
     [userInfo],
   );
-  const 기본정보받았다 = React.useCallback(async () => {
+  const 지역셀렉트값변경시 = React.useCallback((value) => {
+    setUserInfo((prev) => {
+      return {
+        ...prev,
+        selectLocalValue: value,
+      };
+    });
+  }, []);
+  const 나이셀렉트값변경시 = React.useCallback((value) => {
+    setUserInfo((prev) => {
+      return {
+        ...prev,
+        selectAgeValue: value,
+      };
+    });
+  }, []);
+  const 기본정보서버로보내자 = React.useCallback(async () => {
     /**
      * 닉네임
      * 지역
      * 성별
      * 나이등등..
      */
+    // dispatch(userSlice.actions.login());
 
-    dispatch(userSlice.actions.login());
-  }, [dispatch]);
+    // 성별값만 가져와야댐..
+    const { value: selectSexValue } = userInfo.sex.find((item) => {
+      return item.check;
+    });
+
+    /**
+     *   phoneNumber: '',
+  certNumber: '',
+  nickname: '',
+  age: 45,
+  local: local,
+  sex: sex,
+  selectLocalValue: '',
+  selectAgeValue: '',
+     */
+    const { phoneNumber, nickname, selectAgeValue, selectLocalValue } = userInfo;
+
+    try {
+      await request
+        .post('/login', {
+          phoneNumber: phoneNumber,
+          nickname: nickname,
+          age: selectAgeValue,
+          sex: selectSexValue,
+          local: selectLocalValue,
+        })
+        .then((res) => {
+          ca.log(res);
+        });
+    } catch (error) {}
+  }, [dispatch, userInfo]);
 
   const [modaldVisible, setModaldVisible] = React.useState(false);
   const [bottomSheetDown, setBottomSheetDown] = React.useState(false);
@@ -258,7 +305,6 @@ function Auth() {
 
       const seconds = dateObj.getSeconds() - count;
       dateObj.setSeconds(seconds);
-      // console.log(seconds);
       setTimer((prev) => {
         const clonePrev = { ...prev };
         clonePrev.text = `${nowMinutes}:${nowSeconds}`;
@@ -355,6 +401,7 @@ function Auth() {
                     <TextInput
                       autoFocus={true}
                       maxLength={11}
+                      keyboardType="numeric"
                       onSubmitEditing={전화번호받았다}
                       style={styles.textInput}
                       placeholder="010-0000-0000 숫자만 입력해주세요"
@@ -377,6 +424,7 @@ function Auth() {
                       <TextInput
                         autoFocus={true}
                         maxLength={4}
+                        keyboardType="numeric"
                         onSubmitEditing={인증번호받았다}
                         style={[styles.textInput, { flex: 0.85 }]}
                         value={userInfo.certNumber}
@@ -411,7 +459,7 @@ function Auth() {
                * - 군번?
                */
               A03: (
-                <OnBoardingLayout disabled={disabled3} onPress={기본정보받았다} text="가입 완료">
+                <OnBoardingLayout disabled={disabled3} onPress={기본정보서버로보내자} text="가입 완료">
                   <View style={{ height: Platform.OS === 'ios' ? hp('74%') : hp('70%') }}>
                     <Text style={styles.des}>기본정보를 입력해주세요</Text>
                     <View style={{ marginTop: MARGIN.xxxl, height: '70%', justifyContent: 'space-between' }}>
@@ -436,7 +484,7 @@ function Auth() {
                             value: '',
                             key: 1,
                           }}
-                          onValueChange={() => {}}
+                          onValueChange={지역셀렉트값변경시}
                           selectedValue={userInfo.age}
                         />
                       </View>
@@ -450,7 +498,7 @@ function Auth() {
                             value: '',
                             key: 1,
                           }}
-                          onValueChange={() => {}}
+                          onValueChange={나이셀렉트값변경시}
                           selectedValue={userInfo.age}
                         />
                       </View>
@@ -462,7 +510,7 @@ function Auth() {
                               <Tag
                                 data={item}
                                 key={`tag-${item.value}`}
-                                onPress={체크박스체크시.bind(this, item.value, 'sex')}
+                                onPress={성별체크박스체크시.bind(this, item.value, 'sex')}
                                 colorStyle={{
                                   activeBackgroundColor: COLORS.grey800,
                                   activeColor: '#fff',

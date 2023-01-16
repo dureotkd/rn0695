@@ -16,6 +16,8 @@ import { Modal, ToastMessage } from '@src/components';
 import { modalSlice, toastMessageSlice } from '@src/slices';
 import { empty } from '@src/utils';
 
+import Reactotron from 'reactotron-react-native';
+
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const navigationTheme = {

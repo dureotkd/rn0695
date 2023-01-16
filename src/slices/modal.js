@@ -36,11 +36,14 @@ const modal = createSlice({
     },
     hide(state, action) {
       state.code = null;
-      console.log(state);
       state;
     },
   },
   extraReducers: (_builder) => {},
 });
+
+const { actions, reducer } = modal;
+
+export const { show: showModal } = actions;
 
 export default modal;
