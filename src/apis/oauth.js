@@ -62,27 +62,21 @@ const OauthApi = ({ setUserInfo, setModaldVisible }) => {
       const errorObj = new Error(err);
 
       /**
+       * 비정상적으로 에러발생시 팝업
+       */
+
+      throw new Error('zzzz');
+
+      /**
        * 그냥 닫기로 취급한 에러는 팝업 안보여줌
        */
       if (errorObj.toString().includes('error 0.')) {
         return;
       }
-
-      /**
-       * 비정상적으로 에러발생시 팝업
-       */
-      dispatch(
-        modalSlice.actions.show({
-          code: 1000,
-          title: 'zzz',
-          subTitle: 'zzzz',
-        }),
-      );
     }
   }, [dispatch, setModaldVisible, setUserInfo]);
 
   const appleApi = React.useCallback(async () => {
-    console.log('zzz');
     try {
       // performs login request
       const appleAuthResponse = await appleAuth.performRequest({
@@ -125,12 +119,10 @@ const OauthApi = ({ setUserInfo, setModaldVisible }) => {
     } catch (error) {
       const errorObj = new Error(error);
 
-      console.log(errorObj.message, errorObj.toString());
-
       /**
        * 그냥 닫기로 취급한 에러는 팝업 안보여줌
        */
-      if (errorObj.toString().includes('error 1001')) {
+      if (errorObj.toString().includes('error 100')) {
         return;
       }
 
