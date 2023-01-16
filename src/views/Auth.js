@@ -9,6 +9,7 @@ import { arrayHelper } from '@src/helpers';
 import { bottomSheetSlice, userSlice } from '@src/slices';
 import { ca, empty, wait } from '@src/utils';
 import React from 'react';
+import { useErrorHandler } from 'react-error-boundary';
 import { TouchableOpacity, SafeAreaView, Text, View, TextInput, Alert, StyleSheet, Animated, ScrollView, Platform } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useDispatch, useSelector } from 'react-redux';
@@ -38,6 +39,8 @@ const timeGlobalInterval = {
 };
 
 function Auth() {
+  const handleError = useErrorHandler();
+
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [btnLoading, setBtnLoading] = React.useState({

@@ -14,9 +14,11 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import { COLORS, FONT_SIZE, hp, wp } from '@src/assets/style/theme';
 import { Modal, ToastMessage } from '@src/components';
 import { modalSlice, toastMessageSlice } from '@src/slices';
-import { empty } from '@src/utils';
+import { empty, wait } from '@src/utils';
 
 import Reactotron from 'reactotron-react-native';
+import { request } from '@src/apis';
+import { useErrorHandler } from 'react-error-boundary';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -34,6 +36,12 @@ function AppIndex() {
   const { user, modal, toastMessage } = useSelector((state) => {
     return state;
   });
+
+  const handleError = useErrorHandler();
+
+  React.useEffect(() => {
+    (async () => {})();
+  }, []);
 
   /**
    * 로그인 처리
