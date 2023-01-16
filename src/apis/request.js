@@ -3,7 +3,7 @@ import axios from 'axios';
 // ==================================== 요청 ======================================
 
 const instance = axios.create({
-  baseURL: 'https://alpha-api.mozuzi.com',
+  baseURL: 'http://localhost:4000',
   timeout: 6000,
   maxRedirects: 0,
   withCredentials: true,
