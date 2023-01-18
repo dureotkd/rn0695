@@ -7,8 +7,6 @@ function Modal({ modalVisible, renderComponent, confirm, _deny, _permission, tit
   const RenderComponent = renderComponent;
   const resPermissionText = permissionText || '확인';
 
-  console.log('2');
-
   return (
     <ReactModal style={{ zIndex: 10000 }} animationType="fade" transparent={true} visible={modalVisible}>
       {confirm ? (
@@ -23,6 +21,8 @@ function Modal({ modalVisible, renderComponent, confirm, _deny, _permission, tit
                   color: COLORS.lightBlack,
                   textAlign: 'center',
                   lineHeight: 20,
+                  fontSize: FONT_SIZE.md,
+                  marginBottom: 12,
                 }}
               >
                 {subTitle}
@@ -42,7 +42,7 @@ function Modal({ modalVisible, renderComponent, confirm, _deny, _permission, tit
                 </Pressable>
               )}
               <Pressable style={[styles.confirmButton, { flex: 0.85 }]} onPress={_permission}>
-                <Text style={{ color: '#fff' }}>{resPermissionText}</Text>
+                <Text style={{ color: '#fff', fontSize: FONT_SIZE.xl }}>{resPermissionText}</Text>
               </Pressable>
             </View>
           </View>
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
   },
   content: {},
   contentText: {
-    fontSize: FONT_SIZE.gd3,
+    fontSize: FONT_SIZE.xxl,
     marginBottom: MARGIN.sm,
     textAlign: 'center',
     fontWeight: 'bold',
@@ -142,7 +142,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    width: 126,
     height: 41,
     marginHorizontal: 4,
   },

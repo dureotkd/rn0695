@@ -20,7 +20,9 @@ const 시트높이 = hp('33.5%') + 안드로이드시트높이더하기;
 
 const initValue = {
   phoneNumber: '',
+  email: '',
   certNumber: '',
+  certEmailNumber: '',
   nickname: '',
   age: 45,
   local: local,
@@ -59,13 +61,16 @@ function Auth() {
     }
     setUserAge(tmpAge);
   }, []);
-  const [disabled1, disabled2] = React.useMemo(() => {
-    const { certNumber, phoneNumber } = userInfo;
+  const [disabled1, disabled2, disabled4, disabled5] = React.useMemo(() => {
+    const { certNumber, phoneNumber, certEmailNumber, email } = userInfo;
+
     const one = phoneNumber.length === 0 ? true : false;
     const two = certNumber.length === 0 ? true : false;
-    return [one, two];
+    const four = email.length === 0 ? true : false;
+    const five = certEmailNumber.length === 0 ? true : false;
+    return [one, two, four, five];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userInfo.phoneNumber, userInfo.certNumber]);
+  }, [userInfo.phoneNumber, userInfo.certNumber, userInfo.email, userInfo.certEmailNumber]);
 
   const disabled3 = React.useMemo(() => {
     let res = 2;
@@ -102,72 +107,113 @@ function Auth() {
       return;
     }
 
-    await 인증번번호API();
+    // await 인증번호API('sms');
 
     /**
      * 다음 페이지로 이동
      */
     다음회원정보받기팝업보여줘(2);
-  }, [userInfo, 다음회원정보받기팝업보여줘, 인증번번호API]);
+  }, [userInfo, 다음회원정보받기팝업보여줘, 인증번호API]);
+  const 이메일받았으니인증번호보내자 = React.useCallback(async () => {
+    /**
+     * 번호 유효성 체크
+     */
+    const { email = '' } = userInfo;
 
-  const 인증번번호API = React.useCallback(async () => {
-    const { phoneNumber = '' } = userInfo;
+    if (empty(email)) {
+      Alert.alert('이메일을 입력해주세요');
+      return;
+    }
+
+    // await 인증번호API('email');
 
     /**
-     * SMS 전송하기
+     * 다음 페이지로 이동
      */
-    await request
-      .post('/sms/cert', {
-        phoneNumber: phoneNumber,
-      })
-      .then((res) => {})
-      .catch(() => {
-        setModaldVisible((prev) => !prev);
-        apiErrorHandler(dispatch);
-      });
-  }, [dispatch, userInfo]);
+    다음회원정보받기팝업보여줘(5);
+  }, [userInfo, 다음회원정보받기팝업보여줘, 인증번호API]);
 
-  const 인증번호재전송 = React.useCallback(async () => {
-    Alert.alert('재전송 되었습니다');
-    await 인증번번호API();
-    인증번호타이머시작();
-    setUserInfo((prev) => {
-      return {
-        ...prev,
-        certNumber: '',
-      };
-    });
+  const 인증번호API = React.useCallback(
+    async (certType) => {
+      const { phoneNumber = '' } = userInfo;
+
+      /**
+       * SMS 전송하기
+       */
+      // await request
+      //   .post(`/sms/${certType}`, {
+      //     phoneNumber: phoneNumber,
+      //   })
+      //   .then((res) => {})
+      //   .catch(() => {
+      //     setModaldVisible((prev) => !prev);
+      //     apiErrorHandler(dispatch);
+      //   });
+    },
+    [dispatch, userInfo],
+  );
+
+  const 인증번호재전송 = React.useCallback(
+    async (certType) => {
+      Alert.alert('재전송 되었습니다');
+      await 인증번호API(certType);
+      인증번호타이머시작();
+      setUserInfo((prev) => {
+        return {
+          ...prev,
+          certNumber: '',
+          certEmailNumber: '',
+        };
+      });
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [번호받았으니인증번호보내자]);
-  const 인증번호받았다 = React.useCallback(async () => {
-    const { certNumber } = userInfo;
-    if (empty(certNumber)) {
-      Alert.alert('인증번호를 입력해주세요');
-      return;
-    }
-    /**
-     * 인증번호 검증
-     */
-    const { code } = await request
-      .get('/sms/cert', {
-        params: {
-          certNumber: certNumber,
-        },
-      })
-      .then(({ data }) => {
-        return data;
-      })
-      .catch(() => {
-        setModaldVisible((prev) => !prev);
-        apiErrorHandler(dispatch);
-      });
+    [번호받았으니인증번호보내자],
+  );
+  const 인증번호받았다 = React.useCallback(
+    async (certType) => {
+      let { certNumber, certEmailNumber, email } = userInfo;
 
-    if (code !== 'success') {
-      return;
-    }
+      if (certType === 'email') {
+        certNumber = certEmailNumber;
+      }
 
-    다음회원정보받기팝업보여줘(3);
-  }, [dispatch, userInfo, 다음회원정보받기팝업보여줘]);
+      if (empty(certNumber)) {
+        Alert.alert('인증번호를 입력해주세요');
+        return;
+      }
+      /**
+       * 인증번호 검증
+       */
+      // const { code } = await request
+      //   .get(`/sms/${certType}`, {
+      //     params: {
+      //       certNumber: certNumber,
+      //     },
+      //   })
+      //   .then(({ data }) => {
+      //     return data;
+      //   })
+      //   .catch(() => {
+      //     setModaldVisible((prev) => !prev);
+      //     apiErrorHandler(dispatch);
+      //   });
+
+      // if (code !== 'success') {
+      //   return;
+      // }
+
+      switch (certType) {
+        case 'sms':
+          다음회원정보받기팝업보여줘(3);
+          break;
+
+        case 'email':
+          회원가입처리();
+          break;
+      }
+    },
+    [userInfo, 다음회원정보받기팝업보여줘, 회원가입처리],
+  );
   const 성별체크박스체크시 = React.useCallback(
     (value, keyName) => {
       const cloneUserInfo = { ...userInfo };
@@ -223,26 +269,36 @@ function Auth() {
   selectLocalValue: '',
   selectAgeValue: '',
      */
+
+    if (selectSexValue === 'man') {
+      다음회원정보받기팝업보여줘(4);
+      return;
+    }
+
+    회원가입처리();
+
+    // console.log(userApiData);
+  }, [dispatch, userInfo, 다음회원정보받기팝업보여줘]);
+
+  const 회원가입처리 = React.useCallback(async () => {
     const { phoneNumber, nickname, selectAgeValue, selectLocalValue } = userInfo;
 
-    const userApiData = await request
-      .post('/login', {
-        phoneNumber: phoneNumber,
-        nickname: nickname,
-        age: selectAgeValue,
-        sex: selectSexValue,
-        local: selectLocalValue,
-      })
-      .then((res) => {
-        return res;
-      })
-      .catch(() => {
-        setModaldVisible((prev) => !prev);
-        apiErrorHandler(dispatch);
-      });
-
-    console.log(userApiData);
-  }, [dispatch, userInfo]);
+    const userApiData = await request;
+    //   .post('/join', {
+    //     phoneNumber: phoneNumber,
+    //     nickname: nickname,
+    //     age: selectAgeValue,
+    //     sex: selectSexValue,
+    //     local: selectLocalValue,
+    //   })
+    //   .then((res) => {
+    //     return res;
+    //   })
+    //   .catch(() => {
+    //     setModaldVisible((prev) => !prev);
+    //     apiErrorHandler(dispatch);
+    //   });
+  }, [userInfo]);
 
   const [modaldVisible, setModaldVisible] = React.useState(false);
   const [bottomSheetDown, setBottomSheetDown] = React.useState(false);
@@ -449,7 +505,7 @@ function Auth() {
                * 인증번호 받자
                */
               A02: (
-                <OnBoardingLayout onPress={인증번호받았다} disabled={disabled2}>
+                <OnBoardingLayout onPress={인증번호받았다.bind(this, 'sms')} disabled={disabled2}>
                   <View style={{ height: 시트컨텐츠높이 }}>
                     <Text style={styles.des}>
                       인증번호를 입력해주세요 <Text style={{ fontSize: FONT_SIZE.md, color: 'red' }}>{timer.text}</Text>
@@ -459,14 +515,14 @@ function Auth() {
                         autoFocus={true}
                         maxLength={4}
                         keyboardType="numeric"
-                        onSubmitEditing={인증번호받았다}
+                        onSubmitEditing={인증번호받았다.bind(this, 'sms')}
                         style={[styles.textInput, { flex: 0.85 }]}
                         value={userInfo.certNumber}
                         placeholder="XXXX"
                         onChangeText={회원정보받기.bind(this, 'certNumber')}
                       />
                       <TouchableOpacity
-                        onPress={인증번호재전송}
+                        onPress={인증번호재전송.bind(this, 'sms')}
                         activeOpacity={0.4}
                         style={{
                           flex: 0.15,
@@ -493,7 +549,7 @@ function Auth() {
                * - 군번?
                */
               A03: (
-                <OnBoardingLayout disabled={disabled3} onPress={기본정보서버로보내자} text="가입 완료">
+                <OnBoardingLayout disabled={disabled3} onPress={기본정보서버로보내자} text="다음">
                   <View style={{ height: Platform.OS === 'ios' ? hp('74%') : hp('70%') }}>
                     <Text style={styles.des}>기본정보를 입력해주세요</Text>
                     <View style={{ marginTop: MARGIN.xxxl, height: '70%', justifyContent: 'space-between' }}>
@@ -556,6 +612,60 @@ function Auth() {
                           })}
                         </View>
                       </View>
+                    </View>
+                  </View>
+                </OnBoardingLayout>
+              ),
+              A04: (
+                <OnBoardingLayout onPress={이메일받았으니인증번호보내자} disabled={disabled4}>
+                  <View style={{ height: 시트컨텐츠높이 }}>
+                    <Text style={styles.des}>나라사랑 이메일을 입력해주세요</Text>
+                    <View style={{ marginTop: MARGIN.md }}>
+                      <Text style={[styles.des, { fontSize: FONT_SIZE.md, color: COLORS.grey300 }]}>나라사랑카드번호@narasarang.or.kr</Text>
+                    </View>
+                    <TextInput
+                      autoFocus={true}
+                      keyboardType="email"
+                      onSubmitEditing={이메일받았으니인증번호보내자}
+                      style={styles.textInput}
+                      placeholder=""
+                      value={userInfo.email}
+                      onChangeText={회원정보받기.bind(this, 'email')}
+                    />
+                  </View>
+                </OnBoardingLayout>
+              ),
+              A05: (
+                <OnBoardingLayout onPress={인증번호받았다.bind(this, 'email')} disabled={disabled5}>
+                  <View style={{ height: 시트컨텐츠높이 }}>
+                    <Text style={styles.des}>인증번호를 입력해주세요</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <TextInput
+                        autoFocus={true}
+                        maxLength={4}
+                        keyboardType="numeric"
+                        onSubmitEditing={인증번호받았다.bind(this, 'email')}
+                        style={[styles.textInput, { flex: 0.85 }]}
+                        value={userInfo.certEmailNumber}
+                        placeholder="XXXX"
+                        onChangeText={회원정보받기.bind(this, 'certEmailNumber')}
+                      />
+                      <TouchableOpacity
+                        onPress={인증번호재전송.bind(this, 'email')}
+                        activeOpacity={0.4}
+                        style={{
+                          flex: 0.15,
+                          height: hp('4%'),
+                          marginTop: MARGIN.lg,
+                          marginLeft: MARGIN.md,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          borderRadius: 6,
+                          backgroundColor: COLORS.other,
+                        }}
+                      >
+                        <Text style={{ fontSize: FONT_SIZE.md, color: '#fff' }}>재전송</Text>
+                      </TouchableOpacity>
                     </View>
                   </View>
                 </OnBoardingLayout>
