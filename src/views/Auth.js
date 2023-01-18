@@ -620,18 +620,20 @@ function Auth() {
                 <OnBoardingLayout onPress={이메일받았으니인증번호보내자} disabled={disabled4}>
                   <View style={{ height: 시트컨텐츠높이 }}>
                     <Text style={styles.des}>나라사랑 이메일을 입력해주세요</Text>
-                    <View style={{ marginTop: MARGIN.md }}>
-                      <Text style={[styles.des, { fontSize: FONT_SIZE.md, color: COLORS.grey300 }]}>나라사랑카드번호@narasarang.or.kr</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+                      <TextInput
+                        autoFocus={true}
+                        keyboardType="email"
+                        onSubmitEditing={이메일받았으니인증번호보내자}
+                        style={[styles.textInput, { flex: 0.6 }]}
+                        placeholder=""
+                        value={userInfo.email}
+                        onChangeText={회원정보받기.bind(this, 'email')}
+                      />
+                      <View style={{ flex: 0.4, paddingBottom: MARGIN.lg, marginLeft: 2 }}>
+                        <Text style={{ fontSize: FONT_SIZE.xl, color: COLORS.grey600 }}>@narasarang.or.kr</Text>
+                      </View>
                     </View>
-                    <TextInput
-                      autoFocus={true}
-                      keyboardType="email"
-                      onSubmitEditing={이메일받았으니인증번호보내자}
-                      style={styles.textInput}
-                      placeholder=""
-                      value={userInfo.email}
-                      onChangeText={회원정보받기.bind(this, 'email')}
-                    />
                   </View>
                 </OnBoardingLayout>
               ),
