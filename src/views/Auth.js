@@ -41,10 +41,6 @@ const timeGlobalInterval = {
 function Auth() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const [btnLoading, setBtnLoading] = React.useState({
-    kakao: false,
-    apple: false,
-  });
   const { bottomSheet } = useSelector((state) => {
     return state;
   });
@@ -63,7 +59,6 @@ function Auth() {
   }, []);
   const [disabled1, disabled2, disabled4, disabled5] = React.useMemo(() => {
     const { certNumber, phoneNumber, certEmailNumber, email } = userInfo;
-
     const one = phoneNumber.length === 0 ? true : false;
     const two = certNumber.length === 0 ? true : false;
     const four = email.length === 0 ? true : false;
@@ -71,20 +66,16 @@ function Auth() {
     return [one, two, four, five];
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userInfo.phoneNumber, userInfo.certNumber, userInfo.email, userInfo.certEmailNumber]);
-
   const disabled3 = React.useMemo(() => {
     let res = 2;
-
     if (userInfo.nickname.length > 0) {
       res--;
     }
-
     userInfo.sex.forEach((item) => {
       if (item.check) {
         res--;
       }
     });
-
     return res;
   }, [userInfo.sex, userInfo.nickname]);
 
@@ -157,7 +148,6 @@ function Auth() {
     async (certType) => {
       Alert.alert('재전송 되었습니다');
       await 인증번호API(certType);
-      인증번호타이머시작();
       setUserInfo((prev) => {
         return {
           ...prev,
@@ -246,29 +236,10 @@ function Auth() {
     });
   }, []);
   const 기본정보서버로보내자 = React.useCallback(async () => {
-    /**
-     * 닉네임
-     * 지역
-     * 성별
-     * 나이등등..
-     */
-    // dispatch(userSlice.actions.login());
 
-    // 성별값만 가져와야댐..
     const { value: selectSexValue } = userInfo.sex.find((item) => {
       return item.check;
     });
-
-    /**
-     *   phoneNumber: '',
-  certNumber: '',
-  nickname: '',
-  age: 45,
-  local: local,
-  sex: sex,
-  selectLocalValue: '',
-  selectAgeValue: '',
-     */
 
     if (selectSexValue === 'man') {
       다음회원정보받기팝업보여줘(4);
@@ -283,7 +254,7 @@ function Auth() {
   const 회원가입처리 = React.useCallback(async () => {
     const { phoneNumber, nickname, selectAgeValue, selectLocalValue } = userInfo;
 
-    const userApiData = await request;
+    // const userApiData = await request
     //   .post('/join', {
     //     phoneNumber: phoneNumber,
     //     nickname: nickname,
@@ -298,7 +269,12 @@ function Auth() {
     //     setModaldVisible((prev) => !prev);
     //     apiErrorHandler(dispatch);
     //   });
-  }, [userInfo]);
+
+
+    // dispatch(userSlice.actions.login());
+
+
+  }, [dispatch,userInfo]);
 
   const [modaldVisible, setModaldVisible] = React.useState(false);
   const [bottomSheetDown, setBottomSheetDown] = React.useState(false);
@@ -371,48 +347,6 @@ function Auth() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const [timer, setTimer] = React.useState({
-    text: '05:00',
-    cnt: 0,
-  });
-
-  const 인증번호타이머시작 = React.useCallback(async () => {
-    let count = 1;
-    let maxCount = 0;
-    const dateObj = new Date('2021', '01', '01', '01', '5');
-    clearInterval(timeGlobalInterval.me);
-    timeGlobalInterval.me = setInterval(() => {
-      if (maxCount > 300) {
-        return;
-      }
-
-      const nowMinutes = dateObj.getMinutes() === 0 ? '00' : '0' + dateObj.getMinutes();
-      let nowSeconds = dateObj.getSeconds() === 0 ? '00' : dateObj.getSeconds();
-      if (nowSeconds < 10 && nowSeconds !== '00') {
-        nowSeconds = '0' + nowSeconds;
-      }
-
-      const seconds = dateObj.getSeconds() - count;
-      dateObj.setSeconds(seconds);
-      setTimer((prev) => {
-        const clonePrev = { ...prev };
-        clonePrev.text = `${nowMinutes}:${nowSeconds}`;
-        return clonePrev;
-      });
-
-      maxCount++;
-    }, 1000);
-    await wait(360000);
-    clearInterval(timeGlobalInterval.me);
-  }, []);
-  React.useEffect(() => {
-    if (bottomSheet.code !== 'A02') {
-      return;
-    }
-    인증번호타이머시작();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bottomSheet.code]);
-
   /**
    * 소셜로그인 API
    */
@@ -449,7 +383,7 @@ function Auth() {
           text="카카오 로그인"
           logo={require('@assets/image/kakao_login_icon.png')}
           bgColor="#FEE500"
-          loading={btnLoading.kakao}
+          // loading={btnLoading.kakao}
           event={kakaoApi}
           style={{ backgroundColor: '#FEE500' }}
         />
@@ -457,7 +391,7 @@ function Auth() {
           <OauthBtn
             text="Apple 로그인"
             logo={require('@assets/image/apple_logo.png')}
-            loading={btnLoading.apple}
+            // loading={btnLoading.apple}
             event={appleApi}
             color="#fff"
             style={{ marginTop: 12, backgroundColor: '#000' }}
@@ -508,7 +442,7 @@ function Auth() {
                 <OnBoardingLayout onPress={인증번호받았다.bind(this, 'sms')} disabled={disabled2}>
                   <View style={{ height: 시트컨텐츠높이 }}>
                     <Text style={styles.des}>
-                      인증번호를 입력해주세요 <Text style={{ fontSize: FONT_SIZE.md, color: 'red' }}>{timer.text}</Text>
+                      인증번호를 입력해주세요 
                     </Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                       <TextInput
@@ -546,7 +480,6 @@ function Auth() {
                * - 닉네임
                * - 성별
                * - 지역
-               * - 군번?
                */
               A03: (
                 <OnBoardingLayout disabled={disabled3} onPress={기본정보서버로보내자} text="다음">
