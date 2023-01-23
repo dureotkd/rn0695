@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-nativ
 import { COLORS, FONT_SIZE, hp, MARGIN, wp } from '@src/assets/style/theme';
 
 function TagButton(props) {
-  const { data, maxSelect, colorStyle, onPress } = props;
+  const { data, maxSelect, colorStyle, onPress, buttonStyle } = props;
 
   let transBackgroundStyles = '';
   let transFontStyles = '';
@@ -31,7 +31,7 @@ function TagButton(props) {
         name: data.name,
         maxSelect,
       })}
-      style={[styles.button, transBackgroundStyles]}
+      style={[styles.button, transBackgroundStyles, { ...buttonStyle }]}
     >
       <Text style={[transFontStyles]}>{data.name}</Text>
     </TouchableOpacity>

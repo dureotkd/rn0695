@@ -1,42 +1,31 @@
-import React from "react";
+import React from 'react';
 
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from 'react-redux';
 
-import { createStackNavigator } from "@react-navigation/stack";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import {
-  DefaultTheme,
-  NavigationContainer,
-  useNavigation,
-} from "@react-navigation/native";
+import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { DefaultTheme, NavigationContainer, useNavigation } from '@react-navigation/native';
 
-import { Auth, Chat, Heart, Main, User } from "@src/views";
-import {
-  ActivityIndicator,
-  Pressable,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import FastImage from "react-native-fast-image";
+import { Auth, Chat, Heart, Main, User } from '@src/views';
+import { ActivityIndicator, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import FastImage from 'react-native-fast-image';
 
-import AntDesign from "react-native-vector-icons/AntDesign";
-import { COLORS, FONT_SIZE, hp, wp } from "@src/assets/style/theme";
-import { Modal, ToastMessage } from "@src/components";
-import { modalSlice, toastMessageSlice, userSlice } from "@src/slices";
-import { ca, empty, wait } from "@src/utils";
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import { COLORS, FONT_SIZE, hp, wp } from '@src/assets/style/theme';
+import { Modal, ToastMessage } from '@src/components';
+import { modalSlice, toastMessageSlice, userSlice } from '@src/slices';
+import { ca, empty, wait } from '@src/utils';
 
-import Reactotron from "reactotron-react-native";
-import { apiErrorHandler, request } from "@src/apis";
-import PageLoading from "@src/components/PageLoading";
+import Reactotron from 'reactotron-react-native';
+import { apiErrorHandler, request } from '@src/apis';
+import PageLoading from '@src/components/PageLoading';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const navigationTheme = {
   ...DefaultTheme,
   colors: {
-    color: "#000",
+    color: '#000',
     background: COLORS.bg,
     backgroundColor: COLORS.bg,
   },
@@ -80,7 +69,7 @@ const NonLoginedNavi = () => {
   const { PAGES, GROUP_PAGES } = {
     PAGES: [
       {
-        name: "Auth",
+        name: 'Auth',
         component: Auth,
         options: {
           headerShown: false,
@@ -108,14 +97,7 @@ const NonLoginedNavi = () => {
     <Stack.Navigator>
       {PAGES.length > 0 &&
         PAGES.map(({ name, component, options }) => {
-          return (
-            <Stack.Screen
-              key={name}
-              name={name}
-              component={component}
-              options={options}
-            />
-          );
+          return <Stack.Screen key={name} name={name} component={component} options={options} />;
         })}
 
       {GROUP_PAGES.length > 0 &&
@@ -123,14 +105,7 @@ const NonLoginedNavi = () => {
           return (
             <Stack.Group key={index} screenOptions={screenOptions}>
               {pages.map(({ name, component, options }) => {
-                return (
-                  <Stack.Screen
-                    key={name}
-                    name={name}
-                    component={component}
-                    options={options}
-                  />
-                );
+                return <Stack.Screen key={name} name={name} component={component} options={options} />;
               })}
             </Stack.Group>
           );
@@ -147,23 +122,19 @@ const LoginedNavi = () => {
 
   const PAGES = [
     {
-      name: "Main",
+      name: 'Main',
       component: Main,
       options: {
         tabBarIcon: ({ focused }) => {
           return (
             <Pressable
               onPress={() => {
-                navigation.navigate("Main");
+                navigation.navigate('Main');
               }}
             >
               <FastImage
                 style={styles.tabIcon}
-                source={
-                  focused
-                    ? require("@assets/image/tab/home_active.png")
-                    : require("@assets/image/tab/home.png")
-                }
+                source={focused ? require('@assets/image/tab/home_active.png') : require('@assets/image/tab/home.png')}
               />
             </Pressable>
           );
@@ -171,20 +142,20 @@ const LoginedNavi = () => {
       },
     },
     {
-      name: "Heart",
+      name: 'Heart',
       component: Heart,
       options: {
         tabBarIcon: ({ focused }) => {
-          const name = focused ? "heart" : "hearto";
+          const name = focused ? 'heart' : 'hearto';
 
           return (
             <Pressable
               onPress={() => {
-                navigation.navigate("Heart");
+                navigation.navigate('Heart');
               }}
             >
               <Text>
-                <AntDesign name={name} size={wp("6.25%")} />
+                <AntDesign name={name} size={wp('6.25%')} />
               </Text>
             </Pressable>
           );
@@ -192,23 +163,19 @@ const LoginedNavi = () => {
       },
     },
     {
-      name: "Chat",
+      name: 'Chat',
       component: Chat,
       options: {
         tabBarIcon: ({ focused }) => {
           return (
             <Pressable
               onPress={() => {
-                navigation.navigate("Chat");
+                navigation.navigate('Chat');
               }}
             >
               <FastImage
                 style={styles.tabIcon}
-                source={
-                  focused
-                    ? require("@assets/image/tab/chat_active.png")
-                    : require("@assets/image/tab/chat.png")
-                }
+                source={focused ? require('@assets/image/tab/chat_active.png') : require('@assets/image/tab/chat.png')}
               />
             </Pressable>
           );
@@ -216,23 +183,19 @@ const LoginedNavi = () => {
       },
     },
     {
-      name: "User",
+      name: 'User',
       component: User,
       options: {
         tabBarIcon: ({ focused }) => {
           return (
             <Pressable
               onPress={() => {
-                navigation.navigate("User");
+                navigation.navigate('User');
               }}
             >
               <FastImage
                 style={styles.tabIcon}
-                source={
-                  focused
-                    ? require("@assets/image/tab/user_active.png")
-                    : require("@assets/image/tab/user.png")
-                }
+                source={focused ? require('@assets/image/tab/user_active.png') : require('@assets/image/tab/user.png')}
               />
             </Pressable>
           );
@@ -244,27 +207,20 @@ const LoginedNavi = () => {
   return (
     <Tab.Navigator
       screenOptions={{
-        headerTitle: "",
+        headerTitle: '',
         headerStyle: { elevation: 0, shadowOpacity: 0 },
         tabBarShowLabel: false,
         tabBarBadgeStyle: {},
         tabBarStyle: {
           borderTopWidth: 0,
           elevation: 0,
-          height: hp("11%"),
+          height: hp('11%'),
         },
       }}
     >
       {PAGES.length > 0 &&
         PAGES.map(({ name, component, options }) => {
-          return (
-            <Tab.Screen
-              key={name}
-              name={name}
-              component={component}
-              options={options}
-            />
-          );
+          return <Tab.Screen key={name} name={name} component={component} options={options} />;
         })}
     </Tab.Navigator>
   );
@@ -279,7 +235,7 @@ const 로그인처리Hook = () => {
       const {
         data: { loginUser },
       } = await request
-        .get("/login")
+        .post('/login')
         .then((res) => res)
         .catch(() => {
           setLoading((prev) => !prev);
@@ -292,13 +248,13 @@ const 로그인처리Hook = () => {
         return;
       }
 
-      dispatch(
-        userSlice.actions.login({
-          loginUser: loginUser,
-        })
-      );
+      // dispatch(
+      //   userSlice.actions.login({
+      //     loginUser: loginUser,
+      //   }),
+      // );
 
-      dispatch(toastMessageSlice.actions.show("로그인 되었습니다"));
+      // dispatch(toastMessageSlice.actions.show('로그인 되었습니다'));
     })();
   }, [dispatch]);
 
@@ -307,7 +263,7 @@ const 로그인처리Hook = () => {
 
 const styles = StyleSheet.create({
   tabIcon: {
-    width: wp("7%"),
+    width: wp('7%'),
     aspectRatio: 1,
   },
 });

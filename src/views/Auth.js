@@ -18,6 +18,8 @@ const 안드로이드시트높이더하기 = Platform.OS === 'android' ? 80 : 0;
 const 시트컨텐츠높이 = hp('18%') + 안드로이드컨텐츠높이더하기;
 const 시트높이 = hp('33.5%') + 안드로이드시트높이더하기;
 
+const 많은정보시트높이 = hp('90%');
+
 const initValue = {
   phoneNumber: '',
   email: '',
@@ -29,6 +31,8 @@ const initValue = {
   sex: sex,
   selectLocalValue: '',
   selectAgeValue: '',
+  charm: '',
+  interest: '',
 };
 
 const timeGlobalInterval = {
@@ -98,7 +102,7 @@ function Auth() {
       return;
     }
 
-    // await 인증번호API('sms');
+    await 인증번호API('sms');
 
     /**
      * 다음 페이지로 이동
@@ -116,7 +120,7 @@ function Auth() {
       return;
     }
 
-    // await 인증번호API('email');
+    await 인증번호API('email');
 
     /**
      * 다음 페이지로 이동
@@ -126,20 +130,18 @@ function Auth() {
 
   const 인증번호API = React.useCallback(
     async (certType) => {
-      const { phoneNumber = '' } = userInfo;
+      const { phoneNumber = '', email } = userInfo;
 
-      /**
-       * SMS 전송하기
-       */
-      // await request
-      //   .post(`/sms/${certType}`, {
-      //     phoneNumber: phoneNumber,
-      //   })
-      //   .then((res) => {})
-      //   .catch(() => {
-      //     setModaldVisible((prev) => !prev);
-      //     apiErrorHandler(dispatch);
-      //   });
+      await request
+        .post(`/${certType}/cert`, {
+          phoneNumber: phoneNumber,
+          email: email,
+        })
+        .then((res) => {})
+        .catch(() => {
+          setModaldVisible((prev) => !prev);
+          apiErrorHandler(dispatch);
+        });
     },
     [dispatch, userInfo],
   );
@@ -161,10 +163,13 @@ function Auth() {
   );
   const 인증번호받았다 = React.useCallback(
     async (certType) => {
-      let { certNumber, certEmailNumber, email } = userInfo;
+      let { certNumber, certEmailNumber, email, phoneNumber } = userInfo;
+
+      let inputInfo = phoneNumber;
 
       if (certType === 'email') {
         certNumber = certEmailNumber;
+        inputInfo = email;
       }
 
       if (empty(certNumber)) {
@@ -174,23 +179,24 @@ function Auth() {
       /**
        * 인증번호 검증
        */
-      // const { code } = await request
-      //   .get(`/sms/${certType}`, {
-      //     params: {
-      //       certNumber: certNumber,
-      //     },
-      //   })
-      //   .then(({ data }) => {
-      //     return data;
-      //   })
-      //   .catch(() => {
-      //     setModaldVisible((prev) => !prev);
-      //     apiErrorHandler(dispatch);
-      //   });
+      const { code } = await request
+        .get(`/${certType}/cert`, {
+          params: {
+            certNumber: certNumber,
+            inputInfo: inputInfo,
+          },
+        })
+        .then(({ data }) => {
+          return data;
+        })
+        .catch(() => {
+          setModaldVisible((prev) => !prev);
+          apiErrorHandler(dispatch);
+        });
 
-      // if (code !== 'success') {
-      //   return;
-      // }
+      if (code !== 'success') {
+        return;
+      }
 
       switch (certType) {
         case 'sms':
@@ -198,11 +204,11 @@ function Auth() {
           break;
 
         case 'email':
-          회원가입처리();
+          다음회원정보받기팝업보여줘(6);
           break;
       }
     },
-    [userInfo, 다음회원정보받기팝업보여줘, 회원가입처리],
+    [dispatch, userInfo, 다음회원정보받기팝업보여줘],
   );
   const 성별체크박스체크시 = React.useCallback(
     (value, keyName) => {
@@ -236,45 +242,45 @@ function Auth() {
     });
   }, []);
   const 기본정보서버로보내자 = React.useCallback(async () => {
+    const { value: selectSexValue } = userInfo.sex.find((item) => {
+      return item.check;
+    });
+
+    const nextPage = selectSexValue === 'man' ? 4 : 6;
+    다음회원정보받기팝업보여줘(nextPage);
+  }, [userInfo.sex, 다음회원정보받기팝업보여줘]);
+
+  const 회원가입처리 = React.useCallback(async () => {
+    const { phoneNumber, nickname, selectAgeValue, selectLocalValue, interest, charm } = userInfo;
 
     const { value: selectSexValue } = userInfo.sex.find((item) => {
       return item.check;
     });
 
-    if (selectSexValue === 'man') {
-      다음회원정보받기팝업보여줘(4);
-      return;
-    }
+    const { data: loginUser } = await request
+      .post('/join', {
+        phoneNumber: phoneNumber,
+        nickname: nickname,
+        age: selectAgeValue,
+        sex: selectSexValue,
+        local: selectLocalValue,
+        interest: interest,
+        charm: charm,
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch(() => {
+        setModaldVisible((prev) => !prev);
+        apiErrorHandler(dispatch);
+      });
 
-    회원가입처리();
-
-    // console.log(userApiData);
-  }, [dispatch, userInfo, 다음회원정보받기팝업보여줘]);
-
-  const 회원가입처리 = React.useCallback(async () => {
-    const { phoneNumber, nickname, selectAgeValue, selectLocalValue } = userInfo;
-
-    // const userApiData = await request
-    //   .post('/join', {
-    //     phoneNumber: phoneNumber,
-    //     nickname: nickname,
-    //     age: selectAgeValue,
-    //     sex: selectSexValue,
-    //     local: selectLocalValue,
-    //   })
-    //   .then((res) => {
-    //     return res;
-    //   })
-    //   .catch(() => {
-    //     setModaldVisible((prev) => !prev);
-    //     apiErrorHandler(dispatch);
-    //   });
-
-
-    // dispatch(userSlice.actions.login());
-
-
-  }, [dispatch,userInfo]);
+    dispatch(
+      userSlice.actions.login({
+        loginUser: loginUser,
+      }),
+    );
+  }, [dispatch, userInfo]);
 
   const [modaldVisible, setModaldVisible] = React.useState(false);
   const [bottomSheetDown, setBottomSheetDown] = React.useState(false);
@@ -305,7 +311,7 @@ function Auth() {
       const initialState = {
         code: `A0${next}`,
         options: {
-          height: next === 3 ? hp('90%') : 시트높이,
+          height: next === 3 || next === 6 ? 많은정보시트높이 : 시트높이,
         },
       };
 
@@ -346,6 +352,92 @@ function Auth() {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const [관심사정보, set관심사정보] = React.useState({
+    interest: [],
+    charm: [],
+    jobs: [],
+  });
+  React.useEffect(() => {
+    if (bottomSheet.code !== 'A06' || 관심사정보.interest.length > 0) {
+      return;
+    }
+    (async () => {
+      const [{ data: interestList }, { data: charmList }] = await Promise.all([request.get('/interest'), request.get('/charm')]);
+
+      const clone관심사정보 = { ...관심사정보 };
+      clone관심사정보.interest = interestList;
+      clone관심사정보.charm = charmList;
+      set관심사정보(clone관심사정보);
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bottomSheet.code]);
+  const disabled6 = React.useMemo(() => {
+    let cnt = {};
+
+    for (let key in 관심사정보) {
+      관심사정보[key].forEach((item) => {
+        if (item.check) {
+          cnt[key] = 0;
+          cnt[key]++;
+        }
+      });
+    }
+
+    return Object.keys(cnt).length === 2 ? false : true;
+  }, [관심사정보]);
+
+  const MAX_SELECT = 5;
+  const 체크박스체크시 = React.useCallback(
+    (value, keyName) => {
+      let select_cnt = 0;
+
+      const clone관심사정보 = { ...관심사정보 };
+
+      clone관심사정보[keyName].forEach((item) => {
+        if (item.check) {
+          select_cnt++;
+        }
+      });
+
+      clone관심사정보[keyName] = clone관심사정보[keyName].map((item) => {
+        if (item.value === value) {
+          if (select_cnt !== MAX_SELECT) {
+            item.check = !item.check;
+          } else if (item.check === false) {
+            Alert.alert('최대 5개 가능합니다');
+          } else if (item.check === true) {
+            item.check = false;
+          }
+        }
+        return item;
+      });
+
+      set관심사정보(clone관심사정보);
+
+      const 입력받은관심사정보 = {};
+
+      for (let key in 관심사정보) {
+        관심사정보[key].forEach((item) => {
+          if (item.check) {
+            if (!입력받은관심사정보[key]) {
+              입력받은관심사정보[key] = [];
+            }
+            입력받은관심사정보[key].push(item.value);
+          }
+        });
+      }
+
+      setUserInfo((prev) => {
+        return {
+          ...prev,
+          charm: 입력받은관심사정보?.charm?.join('/'),
+          interest: 입력받은관심사정보?.interest?.join('/'),
+        };
+      });
+    },
+    [관심사정보],
+  );
 
   /**
    * 소셜로그인 API
@@ -441,9 +533,7 @@ function Auth() {
               A02: (
                 <OnBoardingLayout onPress={인증번호받았다.bind(this, 'sms')} disabled={disabled2}>
                   <View style={{ height: 시트컨텐츠높이 }}>
-                    <Text style={styles.des}>
-                      인증번호를 입력해주세요 
-                    </Text>
+                    <Text style={styles.des}>인증번호를 입력해주세요</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                       <TextInput
                         autoFocus={true}
@@ -549,6 +639,9 @@ function Auth() {
                   </View>
                 </OnBoardingLayout>
               ),
+              /**
+               * 나라사랑 이메일 받자 [남자]
+               */
               A04: (
                 <OnBoardingLayout onPress={이메일받았으니인증번호보내자} disabled={disabled4}>
                   <View style={{ height: 시트컨텐츠높이 }}>
@@ -570,6 +663,9 @@ function Auth() {
                   </View>
                 </OnBoardingLayout>
               ),
+              /**
+               * 나라사랑 이메일 인증번호 받자 [남자]
+               */
               A05: (
                 <OnBoardingLayout onPress={인증번호받았다.bind(this, 'email')} disabled={disabled5}>
                   <View style={{ height: 시트컨텐츠높이 }}>
@@ -603,6 +699,75 @@ function Auth() {
                       </TouchableOpacity>
                     </View>
                   </View>
+                </OnBoardingLayout>
+              ),
+              /**
+               * 관심사 기본정보
+               * - 직업
+               * - 관심사
+               */
+              A06: (
+                <OnBoardingLayout onPress={회원가입처리} disabled={disabled6}>
+                  <Text style={styles.des}>이제 마지막 정보만 입력하면되요</Text>
+                  <ScrollView style={{ height: Platform.OS === 'ios' ? hp('71%') : hp('67%'), paddingBottom: 50 }}>
+                    <View>
+                      <View style={{ marginTop: MARGIN.xxxl, marginBottom: MARGIN.md }}>
+                        <Text style={styles.inputDes}>관심사</Text>
+                      </View>
+                      <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                        {관심사정보.interest.length > 0 &&
+                          관심사정보.interest.map((item) => {
+                            return (
+                              <Tag
+                                data={item}
+                                key={`tag-${item.value}`}
+                                onPress={체크박스체크시.bind(this, item.value, 'interest')}
+                                buttonStyle={{
+                                  width: wp('26%'),
+                                  paddingVertical: 8,
+                                  paddingHorizontal: 8,
+                                }}
+                                colorStyle={{
+                                  activeBackgroundColor: COLORS.grey800,
+                                  activeColor: '#fff',
+                                  inActiveBackgroundColor: COLORS.grey50,
+                                  inActiveColor: COLORS.grey800,
+                                }}
+                              />
+                            );
+                          })}
+                      </View>
+                    </View>
+                    <View>
+                      <View style={{ marginTop: MARGIN.xxxl, marginBottom: MARGIN.md }}>
+                        <Text style={styles.inputDes}>나의 장점</Text>
+                      </View>
+                      <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                        {관심사정보.charm.length > 0 &&
+                          관심사정보.charm.map((item) => {
+                            return (
+                              <Tag
+                                data={item}
+                                key={`tag-${item.value}`}
+                                onPress={체크박스체크시.bind(this, item.value, 'charm')}
+                                buttonStyle={{
+                                  width: wp('40%'),
+                                  paddingVertical: 8,
+                                  paddingHorizontal: 8,
+                                }}
+                                colorStyle={{
+                                  activeBackgroundColor: COLORS.grey800,
+                                  activeColor: '#fff',
+                                  inActiveBackgroundColor: COLORS.grey50,
+                                  inActiveColor: COLORS.grey800,
+                                }}
+                              />
+                            );
+                          })}
+                      </View>
+                    </View>
+                    <View style={{ height: 100 }} />
+                  </ScrollView>
                 </OnBoardingLayout>
               ),
             }[bottomSheet.code]
