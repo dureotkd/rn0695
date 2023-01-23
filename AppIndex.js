@@ -248,13 +248,13 @@ const 로그인처리Hook = () => {
         return;
       }
 
-      // dispatch(
-      //   userSlice.actions.login({
-      //     loginUser: loginUser,
-      //   }),
-      // );
+      dispatch(
+        userSlice.actions.login({
+          loginUser: loginUser,
+        }),
+      );
 
-      // dispatch(toastMessageSlice.actions.show('로그인 되었습니다'));
+      dispatch(toastMessageSlice.actions.show('로그인 되었습니다'));
     })();
   }, [dispatch]);
 

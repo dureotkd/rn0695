@@ -40,7 +40,7 @@ instance.interceptors.response.use(
     // 응답 로직 생성
     response,
   ) => {
-    if (response.code === 'error' && response.message) {
+    if (response.code === 'fail' && response.message) {
       Alert.alert(response.message);
     }
 

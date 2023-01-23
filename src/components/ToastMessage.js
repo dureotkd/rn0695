@@ -8,7 +8,7 @@ function ToastMessage({ message = '' }) {
   const animate = new Animated.Value(0);
   const topStyle = animate.interpolate({
     inputRange: [0, 1],
-    outputRange: [-50, hp('13')],
+    outputRange: [-50, 100],
   });
 
   React.useEffect(() => {

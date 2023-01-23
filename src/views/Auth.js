@@ -296,9 +296,9 @@ function Auth() {
     dispatch(
       bottomSheetSlice.actions.set({
         show: true,
-        code: 'A06',
+        code: 'A01',
         options: {
-          height: 많은정보시트높이,
+          height: 시트높이,
         },
       }),
     );
@@ -359,7 +359,7 @@ function Auth() {
     jobs: [],
   });
   React.useEffect(() => {
-    if (bottomSheet.code !== 'A06' || 관심사정보.interest.length > 0) {
+    if (bottomSheet.code !== 'A06') {
       return;
     }
     (async () => {
@@ -711,8 +711,9 @@ function Auth() {
                   <Text style={styles.des}>이제 마지막 정보만 입력하면되요</Text>
                   <ScrollView style={{ height: Platform.OS === 'ios' ? hp('71%') : hp('67%') }}>
                     <View>
-                      <View style={{ marginTop: MARGIN.xxxl, marginBottom: MARGIN.md }}>
+                      <View style={{ marginTop: MARGIN.xxxl, marginBottom: MARGIN.md, flexDirection: 'row', alignItems: 'flex-end' }}>
                         <Text style={styles.inputDes}>관심사</Text>
+                        <Text style={[{ color: 'red' }]}> (최대 5개)</Text>
                       </View>
                       <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                         {관심사정보.interest.length > 0 &&
@@ -739,8 +740,9 @@ function Auth() {
                       </View>
                     </View>
                     <View>
-                      <View style={{ marginTop: MARGIN.xxxl, marginBottom: MARGIN.md }}>
+                      <View style={{ marginTop: MARGIN.xxxl, marginBottom: MARGIN.md, flexDirection: 'row', alignItems: 'flex-end' }}>
                         <Text style={styles.inputDes}>나의 장점</Text>
+                        <Text style={[{ color: 'red' }]}> (최대 5개)</Text>
                       </View>
                       <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                         {관심사정보.charm.length > 0 &&
