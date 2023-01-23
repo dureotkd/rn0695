@@ -5,7 +5,7 @@ import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
 
 function OnBoardingLayout({ children, onPress, disabled, text = '다음' }) {
   return (
-    <View style={{ padding: 18, marginTop: 8 }}>
+    <View style={{ flex: 1, padding: 18, marginTop: 8 }} onStartShouldSetResponder={() => true}>
       {children}
       <TouchableOpacity
         onPress={onPress}

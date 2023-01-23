@@ -296,9 +296,9 @@ function Auth() {
     dispatch(
       bottomSheetSlice.actions.set({
         show: true,
-        code: 'A01',
+        code: 'A06',
         options: {
-          height: 시트높이,
+          height: 많은정보시트높이,
         },
       }),
     );
@@ -709,7 +709,7 @@ function Auth() {
               A06: (
                 <OnBoardingLayout onPress={회원가입처리} disabled={disabled6}>
                   <Text style={styles.des}>이제 마지막 정보만 입력하면되요</Text>
-                  <ScrollView style={{ height: Platform.OS === 'ios' ? hp('71%') : hp('67%'), paddingBottom: 50 }}>
+                  <ScrollView style={{ height: Platform.OS === 'ios' ? hp('71%') : hp('67%') }}>
                     <View>
                       <View style={{ marginTop: MARGIN.xxxl, marginBottom: MARGIN.md }}>
                         <Text style={styles.inputDes}>관심사</Text>

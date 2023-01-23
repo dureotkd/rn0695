@@ -133,9 +133,7 @@ const BottomSheet = ({ modalVisible, setModalVisible, avoidKeyboard, bottomSheet
             <View style={styles.etcs} />
             <Text>{''}</Text>
           </View>
-          <ScrollView showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false} style={styles.bottomSheetContainer}>
-            {children}
-          </ScrollView>
+          {children}
           {buttonComponent && buttonComponent()}
         </Animated.View>
       </Pressable>
