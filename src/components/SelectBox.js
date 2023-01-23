@@ -5,7 +5,6 @@ import { Platform } from 'react-native';
 
 import RNPickerSelect from 'react-native-picker-select';
 
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
 // IOS
