@@ -2,8 +2,12 @@
 import React from 'react';
 import { Animated, Text } from 'react-native';
 import { COLORS, hp } from '@assets/style/theme';
+import { useDispatch } from 'react-redux';
+import { toastMessageSlice } from '@src/slices';
 
 function ToastMessage({ message = '' }) {
+  const dispatch = useDispatch();
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const animate = new Animated.Value(0);
   const topStyle = animate.interpolate({
@@ -23,9 +27,11 @@ function ToastMessage({ message = '' }) {
         delay: 1500,
         duration: 350,
         useNativeDriver: false,
-      }).start();
+      }).start(() => {
+        dispatch(toastMessageSlice.actions.hide());
+      });
     });
-  }, [animate]);
+  }, [animate, dispatch]);
 
   return (
     <Animated.View

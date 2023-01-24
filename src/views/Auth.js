@@ -502,7 +502,7 @@ function Auth() {
           modalVisible={modaldVisible}
           setModalVisible={setModaldVisible}
           bottomSheetDown={bottomSheetDown}
-          avoidKeyboard={bottomSheet.code === 'A03' ? false : true}
+          avoidKeyboard={bottomSheet.code === 'A03' || bottomSheet.code === 'A06' ? false : true}
           {...bottomSheet.options}
         >
           {

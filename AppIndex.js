@@ -12,13 +12,12 @@ import FastImage from 'react-native-fast-image';
 
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { COLORS, FONT_SIZE, hp, wp } from '@src/assets/style/theme';
-import { Modal, ToastMessage } from '@src/components';
-import { modalSlice, toastMessageSlice, userSlice } from '@src/slices';
-import { ca, empty, wait } from '@src/utils';
+import { BottomSheet, Modal, ToastMessage } from '@src/components';
+import { bottomSheetSlice, modalSlice, toastMessageSlice, userSlice } from '@src/slices';
 
-import Reactotron from 'reactotron-react-native';
 import { apiErrorHandler, request } from '@src/apis';
 import PageLoading from '@src/components/PageLoading';
+import { wait } from '@src/utils';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -40,9 +39,9 @@ function AppIndex() {
 
   const { loading } = 로그인처리Hook();
 
-  if (loading) {
-    return <PageLoading />;
-  }
+  // if (loading) {
+  //   return <PageLoading />;
+  // }
 
   return (
     <NavigationContainer theme={navigationTheme}>
@@ -119,6 +118,14 @@ const NonLoginedNavi = () => {
  */
 const LoginedNavi = () => {
   const navigation = useNavigation();
+
+  const { searchSecondText } = 자동매칭타임Hook();
+
+  const { socketObj } = 자동매치Hook();
+
+  const { bottomSheet } = useSelector((state) => {
+    return state;
+  });
 
   const PAGES = [
     {
@@ -205,24 +212,50 @@ const LoginedNavi = () => {
   ];
 
   return (
-    <Tab.Navigator
-      screenOptions={{
-        headerTitle: '',
-        headerStyle: { elevation: 0, shadowOpacity: 0 },
-        tabBarShowLabel: false,
-        tabBarBadgeStyle: {},
-        tabBarStyle: {
-          borderTopWidth: 0,
-          elevation: 0,
-          height: hp('11%'),
-        },
-      }}
-    >
-      {PAGES.length > 0 &&
-        PAGES.map(({ name, component, options }) => {
-          return <Tab.Screen key={name} name={name} component={component} options={options} />;
-        })}
-    </Tab.Navigator>
+    <React.Fragment>
+      <Tab.Navigator
+        screenOptions={{
+          headerTitle: '',
+          headerStyle: { elevation: 0, shadowOpacity: 0 },
+          tabBarShowLabel: false,
+          tabBarBadgeStyle: {},
+          tabBarStyle: {
+            borderTopWidth: 0,
+            elevation: 0,
+          },
+          headerLeft: () => {
+            return (
+              <View style={{ paddingHorizontal: 14 }}>
+                <Text>군개팅 - 로고</Text>
+              </View>
+            );
+          },
+          headerRight: () => {
+            return (
+              <View style={{ paddingHorizontal: 14 }}>
+                <Text style={{ fontSize: FONT_SIZE.sm, fontWeight: '500' }}>{searchSecondText}</Text>
+              </View>
+            );
+          },
+        }}
+      >
+        {PAGES.length > 0 &&
+          PAGES.map(({ name, component, options }) => {
+            return <Tab.Screen key={name} name={name} component={component} options={options} />;
+          })}
+      </Tab.Navigator>
+      {
+        {
+          M01: (
+            <BottomSheet modalVisible={true}>
+              <View>
+                <Text>aa</Text>
+              </View>
+            </BottomSheet>
+          ),
+        }[bottomSheet.code]
+      }
+    </React.Fragment>
   );
 };
 
@@ -259,6 +292,86 @@ const 로그인처리Hook = () => {
   }, [dispatch]);
 
   return { loading };
+};
+
+const 자동매치Hook = () => {
+  const dispatch = useDispatch();
+
+  const [socketObj, setSocketObj] = React.useState({});
+
+  const {
+    autoMatch: { start },
+  } = useSelector((state) => {
+    return state;
+  });
+
+  React.useEffect(() => {
+    console.log('zz');
+  }, []);
+
+  React.useEffect(() => {
+    if (!start) {
+      return;
+    }
+
+    // (async () => {
+    //   dispatch(
+    //     bottomSheetSlice.actions.set({
+    //       show: true,
+    //       code: 'M01',
+    //       options: {
+    //         height: 300,
+    //       },
+    //     }),
+    //   );
+    // })();
+  }, [dispatch, start]);
+
+  return { socketObj };
+};
+
+const 자동매칭타임Hook = () => {
+  let [searchSecond, setSearchSecond] = React.useState(1);
+  let [searchSecondText, setSearchSecondText] = React.useState('00:00');
+  let [searchInterval, setSearchInterval] = React.useState({});
+
+  const dispatch = useDispatch();
+
+  const { autoMatch } = useSelector((state) => {
+    return state;
+  });
+
+  const 자동매칭 = React.useCallback(() => {
+    if (autoMatch.start) {
+      const interval = setInterval(() => {
+        const timmerArr = searchSecondText.split(':');
+        const nowDate = new Date('2022', '07', '06', '1', timmerArr[0], timmerArr[1] + searchSecond);
+        let newMin = nowDate.getMinutes();
+        let newSec = nowDate.getSeconds();
+        if (newMin < 10) {
+          newMin = `0${newMin}`;
+        }
+        if (newSec < 10) {
+          newSec = `0${newSec}`;
+        }
+        setSearchSecond(searchSecond++);
+        setSearchSecondText(`${newMin}:${newSec}`);
+      }, 1000);
+      setSearchInterval(interval);
+    } else {
+      clearInterval(searchInterval);
+      setSearchInterval({});
+      setSearchSecond(1);
+      setSearchSecondText('00:00');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, autoMatch.start]);
+
+  React.useEffect(() => {
+    자동매칭();
+  }, [자동매칭]);
+
+  return { searchSecondText };
 };
 
 const styles = StyleSheet.create({
